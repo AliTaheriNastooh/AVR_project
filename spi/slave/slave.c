@@ -36,9 +36,10 @@ Data Stack size         : 512
     SPDR = data;                                  //Load data into buffer
     while(!(SPSR & (1<<SPIF) )){
         PORTD.1=1;
-        delay_ms(100);
+        delay_ms(300);
         PORTD.1=0;
     }                  //Wait until transmission complete
+    
     return(SPDR);                                 //Return received data
 }
 void main(void)
@@ -174,17 +175,20 @@ data_r=0;
 data_t=1;
 while (1)
       {
-      delay_ms(200); 
+
+
+      delay_ms(500); 
       data_r=0; 
       data_r = spi_tranceiver(data_t);
       lcd_clear();
-      sprintf(lcd_show,"recieve=%d send=%d ",data_r,data_t);
+      sprintf(lcd_show,"t=%d r=%d\n",data_t,data_r);
       lcd_puts(lcd_show);
       if(data_r==ACKMaster){
             if(data_t%4==0){
+                delay_ms(200);
                 data_r=0; 
                 data_r = spi_tranceiver(ACKSlave); 
-                sprintf(lcd_show,"recieve=%d send=%d",data_r,data_t);
+                sprintf(lcd_show,"tt=%d rr=%d",ACKSlave,data_r);
                 lcd_puts(lcd_show);
             }
             data_t++;
@@ -194,7 +198,7 @@ while (1)
 
       delay_ms(100);
       PORTD.0=0;
-      delay_ms(200);
+      delay_ms(500);
       // Place your code here
 
       }

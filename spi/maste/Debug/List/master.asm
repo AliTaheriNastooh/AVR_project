@@ -1125,10 +1125,10 @@ _tbl16_G102:
 	.DB  0x0,0x10,0x0,0x1,0x10,0x0,0x1,0x0
 
 _0x0:
-	.DB  0x54,0x72,0x61,0x6E,0x73,0x6D,0x69,0x74
-	.DB  0x3A,0x25,0x64,0x20,0x74,0x6F,0x3A,0x25
-	.DB  0x64,0x20,0x72,0x65,0x63,0x3A,0x25,0x64
-	.DB  0x0
+	.DB  0x54,0x3A,0x25,0x64,0x20,0x64,0x3A,0x25
+	.DB  0x64,0x20,0x72,0x3A,0x25,0x64,0xA,0x0
+	.DB  0x54,0x3A,0x25,0x64,0x20,0x64,0x3A,0x25
+	.DB  0x64,0x20,0x72,0x3A,0x25,0x64,0x0
 _0x2000003:
 	.DB  0x80,0xC0
 
@@ -1281,9 +1281,9 @@ _0x3:
 	RJMP _0x5
 ; 0000 002C         PORTD.1=1;
 	SBI  0x12,1
-; 0000 002D         delay_ms(100);
-	LDI  R26,LOW(100)
-	LDI  R27,0
+; 0000 002D         delay_ms(300);
+	LDI  R26,LOW(300)
+	LDI  R27,HIGH(300)
 	CALL _delay_ms
 ; 0000 002E         PORTD.1=0;
 	CBI  0x12,1
@@ -1526,83 +1526,175 @@ _main:
 _0x21:
 ; 0000 00CD       {
 ; 0000 00CE 
-; 0000 00CF 
-; 0000 00D0         PORTD.7=0;
-	CBI  0x12,7
-; 0000 00D1         delay_ms(200);
-	LDI  R26,LOW(200)
-	LDI  R27,0
+; 0000 00CF       if(whichSlave==0){
+	MOV  R0,R20
+	OR   R0,R21
+	BRNE _0x24
+; 0000 00D0                PORTB.0=0;
+	CBI  0x18,0
+; 0000 00D1         }else{
+	RJMP _0x27
+_0x24:
+; 0000 00D2             if(whichSlave==1){
+	LDI  R30,LOW(1)
+	LDI  R31,HIGH(1)
+	CP   R30,R20
+	CPC  R31,R21
+	BRNE _0x28
+; 0000 00D3                 PORTB.1=0;
+	CBI  0x18,1
+; 0000 00D4             }else{
+	RJMP _0x2B
+_0x28:
+; 0000 00D5                 if(whichSlave==2){
+	LDI  R30,LOW(2)
+	LDI  R31,HIGH(2)
+	CP   R30,R20
+	CPC  R31,R21
+	BRNE _0x2C
+; 0000 00D6                    PORTB.2=0;
+	CBI  0x18,2
+; 0000 00D7                 }
+; 0000 00D8             }
+_0x2C:
+_0x2B:
+; 0000 00D9         }
+_0x27:
+; 0000 00DA 
+; 0000 00DB         delay_ms(500);
+	LDI  R26,LOW(500)
+	LDI  R27,HIGH(500)
 	CALL _delay_ms
-; 0000 00D2         data = 0x00;                    //Reset ACK in "data"
+; 0000 00DC         data = 0x00;                    //Reset ACK in "data"
 	LDI  R17,LOW(0)
-; 0000 00D3         data = spi_tranceiver(ACKMaster);
+; 0000 00DD         data = spi_tranceiver(ACKMaster);
 	MOV  R26,R18
 	RCALL _spi_tranceiver
 	MOV  R17,R30
-; 0000 00D4         lcd_clear();
+; 0000 00DE         lcd_clear();
 	RCALL _lcd_clear
-; 0000 00D5         sprintf(lcd_show,"Transmit:%d to:%d rec:%d",ACKMaster,whichSlave,data);
-	CALL SUBOPT_0x0
+; 0000 00DF         sprintf(lcd_show,"T:%d d:%d r:%d\n",ACKMaster,whichSlave,data);
+	MOVW R30,R28
+	ADIW R30,1
+	ST   -Y,R31
+	ST   -Y,R30
+	__POINTW1FN _0x0,0
+	ST   -Y,R31
+	ST   -Y,R30
 	MOV  R30,R18
+	CALL SUBOPT_0x0
 	CALL SUBOPT_0x1
 	CALL SUBOPT_0x2
-	CALL SUBOPT_0x3
-; 0000 00D6         lcd_puts(lcd_show);
-; 0000 00D7         if(data%4==0){
+; 0000 00E0         lcd_puts(lcd_show);
+; 0000 00E1         if(data%4==0){
 	MOV  R26,R17
 	CLR  R27
 	LDI  R30,LOW(4)
 	LDI  R31,HIGH(4)
 	CALL __MODW21
 	SBIW R30,0
-	BRNE _0x26
-; 0000 00D8             data = 0x00;                    //Reset ACK in "data"
-	LDI  R17,LOW(0)
-; 0000 00D9             data = spi_tranceiver(x);
-	MOV  R26,R16
-	RCALL _spi_tranceiver
-	MOV  R17,R30
-; 0000 00DA             sprintf(lcd_show,"Transmit:%d to:%d rec:%d",x,whichSlave,data);
-	CALL SUBOPT_0x0
-	MOV  R30,R16
-	CALL SUBOPT_0x1
-	CALL SUBOPT_0x2
-	CALL SUBOPT_0x3
-; 0000 00DB             lcd_puts(lcd_show);
-; 0000 00DC             if(data==ACKSlave){
-	CP   R19,R17
-	BRNE _0x27
-; 0000 00DD                 x++;
-	SUBI R16,-1
-; 0000 00DE                 whichSlave++;
-	__ADDWRN 20,21,1
-; 0000 00DF             }
-; 0000 00E0         }
-_0x27:
-; 0000 00E1         PORTD.0=1;
-_0x26:
-	SBI  0x12,0
-; 0000 00E2         delay_ms(100);
-	LDI  R26,LOW(100)
-	LDI  R27,0
-	CALL _delay_ms
-; 0000 00E3         PORTD.0=0;
-	CBI  0x12,0
-; 0000 00E4 
-; 0000 00E5 
-; 0000 00E6 
-; 0000 00E7         PORTD.7=1;
-	SBI  0x12,7
-; 0000 00E8         delay_ms(200);
+	BRNE _0x2F
+; 0000 00E2             delay_ms(200);
 	LDI  R26,LOW(200)
 	LDI  R27,0
 	CALL _delay_ms
-; 0000 00E9 
-; 0000 00EA       }
+; 0000 00E3             data = 0x00;                    //Reset ACK in "data"
+	LDI  R17,LOW(0)
+; 0000 00E4             data = spi_tranceiver(x);
+	MOV  R26,R16
+	RCALL _spi_tranceiver
+	MOV  R17,R30
+; 0000 00E5             sprintf(lcd_show,"T:%d d:%d r:%d",x,whichSlave,data);
+	MOVW R30,R28
+	ADIW R30,1
+	ST   -Y,R31
+	ST   -Y,R30
+	__POINTW1FN _0x0,16
+	ST   -Y,R31
+	ST   -Y,R30
+	MOV  R30,R16
+	CALL SUBOPT_0x0
+	CALL SUBOPT_0x1
+	CALL SUBOPT_0x2
+; 0000 00E6             lcd_puts(lcd_show);
+; 0000 00E7             if(data==ACKSlave){
+	CP   R19,R17
+	BRNE _0x30
+; 0000 00E8                 x++;
+	SUBI R16,-1
+; 0000 00E9                 whichSlave++;
+	__ADDWRN 20,21,1
+; 0000 00EA             }
+; 0000 00EB         }
+_0x30:
+; 0000 00EC 
+; 0000 00ED 
+; 0000 00EE         if(whichSlave-1==0){
+_0x2F:
+	MOVW R30,R20
+	SBIW R30,1
+	BRNE _0x31
+; 0000 00EF                PORTB.0=1;
+	SBI  0x18,0
+; 0000 00F0         }else{
+	RJMP _0x34
+_0x31:
+; 0000 00F1             if(whichSlave-1==1){
+	MOVW R30,R20
+	SBIW R30,1
+	CPI  R30,LOW(0x1)
+	LDI  R26,HIGH(0x1)
+	CPC  R31,R26
+	BRNE _0x35
+; 0000 00F2                 PORTB.1=1;
+	SBI  0x18,1
+; 0000 00F3             }else{
+	RJMP _0x38
+_0x35:
+; 0000 00F4                 if(whichSlave-1==2){
+	MOVW R30,R20
+	SBIW R30,1
+	CPI  R30,LOW(0x2)
+	LDI  R26,HIGH(0x2)
+	CPC  R31,R26
+	BRNE _0x39
+; 0000 00F5                    PORTB.2=1;
+	SBI  0x18,2
+; 0000 00F6                 }
+; 0000 00F7             }
+_0x39:
+_0x38:
+; 0000 00F8         }
+_0x34:
+; 0000 00F9 
+; 0000 00FA         if(whichSlave==3){
+	LDI  R30,LOW(3)
+	LDI  R31,HIGH(3)
+	CP   R30,R20
+	CPC  R31,R21
+	BRNE _0x3C
+; 0000 00FB             whichSlave=0;
+	__GETWRN 20,21,0
+; 0000 00FC         }
+; 0000 00FD         PORTD.0=1;
+_0x3C:
+	SBI  0x12,0
+; 0000 00FE         delay_ms(100);
+	LDI  R26,LOW(100)
+	LDI  R27,0
+	CALL _delay_ms
+; 0000 00FF         PORTD.0=0;
+	CBI  0x12,0
+; 0000 0100         delay_ms(500);
+	LDI  R26,LOW(500)
+	LDI  R27,HIGH(500)
+	CALL _delay_ms
+; 0000 0101 
+; 0000 0102       }
 	RJMP _0x21
-; 0000 00EB }
-_0x2E:
-	RJMP _0x2E
+; 0000 0103 }
+_0x41:
+	RJMP _0x41
 ; .FEND
 ;
 ;/*
@@ -1633,6 +1725,12 @@ _0x2E:
 ;            whichSlave=0;
 ;        }
 ;*/
+; /*
+;   PORTD.7=0;
+;   PORTD.7=1;
+;
+;
+; */
 	#ifndef __SLEEP_DEFINED__
 	#define __SLEEP_DEFINED__
 	.EQU __se_bit=0x80
@@ -1697,11 +1795,11 @@ _lcd_gotoxy:
 _lcd_clear:
 ; .FSTART _lcd_clear
 	LDI  R26,LOW(2)
-	CALL SUBOPT_0x4
+	CALL SUBOPT_0x3
 	LDI  R26,LOW(12)
 	RCALL __lcd_write_data
 	LDI  R26,LOW(1)
-	CALL SUBOPT_0x4
+	CALL SUBOPT_0x3
 	LDI  R30,LOW(0)
 	MOV  R4,R30
 	MOV  R5,R30
@@ -1778,9 +1876,9 @@ _lcd_init:
 	LDI  R26,LOW(20)
 	LDI  R27,0
 	CALL _delay_ms
-	CALL SUBOPT_0x5
-	CALL SUBOPT_0x5
-	CALL SUBOPT_0x5
+	CALL SUBOPT_0x4
+	CALL SUBOPT_0x4
+	CALL SUBOPT_0x4
 	LDI  R26,LOW(32)
 	RCALL __lcd_write_nibble_G100
 	__DELAY_USW 200
@@ -1919,7 +2017,7 @@ _0x2040016:
 	LDI  R17,LOW(1)
 	RJMP _0x204001E
 _0x204001D:
-	CALL SUBOPT_0x6
+	CALL SUBOPT_0x5
 _0x204001E:
 	RJMP _0x204001B
 _0x204001C:
@@ -1927,7 +2025,7 @@ _0x204001C:
 	BRNE _0x204001F
 	CPI  R18,37
 	BRNE _0x2040020
-	CALL SUBOPT_0x6
+	CALL SUBOPT_0x5
 	RJMP _0x20400CC
 _0x2040020:
 	LDI  R17,LOW(2)
@@ -1984,26 +2082,26 @@ _0x2040029:
 	MOV  R30,R18
 	CPI  R30,LOW(0x63)
 	BRNE _0x204002F
-	CALL SUBOPT_0x7
+	CALL SUBOPT_0x6
 	LDD  R30,Y+16
 	LDD  R31,Y+16+1
 	LDD  R26,Z+4
 	ST   -Y,R26
-	CALL SUBOPT_0x8
+	CALL SUBOPT_0x7
 	RJMP _0x2040030
 _0x204002F:
 	CPI  R30,LOW(0x73)
 	BRNE _0x2040032
-	CALL SUBOPT_0x7
-	CALL SUBOPT_0x9
+	CALL SUBOPT_0x6
+	CALL SUBOPT_0x8
 	CALL _strlen
 	MOV  R17,R30
 	RJMP _0x2040033
 _0x2040032:
 	CPI  R30,LOW(0x70)
 	BRNE _0x2040035
-	CALL SUBOPT_0x7
-	CALL SUBOPT_0x9
+	CALL SUBOPT_0x6
+	CALL SUBOPT_0x8
 	CALL _strlenf
 	MOV  R17,R30
 	ORI  R16,LOW(8)
@@ -2048,8 +2146,8 @@ _0x2040040:
 _0x204003D:
 	SBRS R16,2
 	RJMP _0x2040042
-	CALL SUBOPT_0x7
-	CALL SUBOPT_0xA
+	CALL SUBOPT_0x6
+	CALL SUBOPT_0x9
 	LDD  R26,Y+11
 	TST  R26
 	BRPL _0x2040043
@@ -2069,8 +2167,8 @@ _0x2040044:
 _0x2040045:
 	RJMP _0x2040046
 _0x2040042:
-	CALL SUBOPT_0x7
-	CALL SUBOPT_0xA
+	CALL SUBOPT_0x6
+	CALL SUBOPT_0x9
 _0x2040046:
 _0x2040036:
 	SBRC R16,0
@@ -2093,7 +2191,7 @@ _0x204004D:
 _0x204004B:
 	LDI  R18,LOW(32)
 _0x204004E:
-	CALL SUBOPT_0x6
+	CALL SUBOPT_0x5
 	SUBI R21,LOW(1)
 	RJMP _0x2040048
 _0x204004A:
@@ -2119,7 +2217,7 @@ _0x2040053:
 	STD  Y+6,R26
 	STD  Y+6+1,R27
 _0x2040054:
-	CALL SUBOPT_0x6
+	CALL SUBOPT_0x5
 	CPI  R21,0
 	BREQ _0x2040055
 	SUBI R21,LOW(1)
@@ -2198,7 +2296,7 @@ _0x20400CD:
 	RJMP _0x204006A
 	ANDI R16,LOW(251)
 	ST   -Y,R20
-	CALL SUBOPT_0x8
+	CALL SUBOPT_0x7
 	CPI  R21,0
 	BREQ _0x204006B
 	SUBI R21,LOW(1)
@@ -2206,7 +2304,7 @@ _0x204006B:
 _0x204006A:
 _0x2040069:
 _0x2040061:
-	CALL SUBOPT_0x6
+	CALL SUBOPT_0x5
 	CPI  R21,0
 	BREQ _0x204006C
 	SUBI R21,LOW(1)
@@ -2228,7 +2326,7 @@ _0x204006E:
 	SUBI R21,LOW(1)
 	LDI  R30,LOW(32)
 	ST   -Y,R30
-	CALL SUBOPT_0x8
+	CALL SUBOPT_0x7
 	RJMP _0x204006E
 _0x2040070:
 _0x204006D:
@@ -2252,7 +2350,7 @@ _sprintf:
 	MOV  R15,R24
 	SBIW R28,6
 	CALL __SAVELOCR4
-	CALL SUBOPT_0xB
+	CALL SUBOPT_0xA
 	SBIW R30,0
 	BRNE _0x2040072
 	LDI  R30,LOW(65535)
@@ -2263,7 +2361,7 @@ _0x2040072:
 	ADIW R26,6
 	CALL __ADDW2R15
 	MOVW R16,R26
-	CALL SUBOPT_0xB
+	CALL SUBOPT_0xA
 	STD  Y+6,R30
 	STD  Y+6+1,R31
 	LDI  R30,LOW(0)
@@ -2341,19 +2439,8 @@ __base_y_G100:
 	.BYTE 0x4
 
 	.CSEG
-;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:3 WORDS
-SUBOPT_0x0:
-	MOVW R30,R28
-	ADIW R30,1
-	ST   -Y,R31
-	ST   -Y,R30
-	__POINTW1FN _0x0,0
-	ST   -Y,R31
-	ST   -Y,R30
-	RET
-
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:6 WORDS
-SUBOPT_0x1:
+SUBOPT_0x0:
 	CLR  R31
 	CLR  R22
 	CLR  R23
@@ -2361,15 +2448,15 @@ SUBOPT_0x1:
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:3 WORDS
-SUBOPT_0x2:
+SUBOPT_0x1:
 	MOVW R30,R20
 	CALL __CWD1
 	CALL __PUTPARD1
 	MOV  R30,R17
-	RJMP SUBOPT_0x1
+	RJMP SUBOPT_0x0
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:3 WORDS
-SUBOPT_0x3:
+SUBOPT_0x2:
 	LDI  R24,12
 	CALL _sprintf
 	ADIW R28,16
@@ -2378,21 +2465,21 @@ SUBOPT_0x3:
 	JMP  _lcd_puts
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
-SUBOPT_0x4:
+SUBOPT_0x3:
 	CALL __lcd_write_data
 	LDI  R26,LOW(3)
 	LDI  R27,0
 	JMP  _delay_ms
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:7 WORDS
-SUBOPT_0x5:
+SUBOPT_0x4:
 	LDI  R26,LOW(48)
 	CALL __lcd_write_nibble_G100
 	__DELAY_USW 200
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:13 WORDS
-SUBOPT_0x6:
+SUBOPT_0x5:
 	ST   -Y,R18
 	LDD  R26,Y+13
 	LDD  R27,Y+13+1
@@ -2402,7 +2489,7 @@ SUBOPT_0x6:
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 5 TIMES, CODE SIZE REDUCTION:9 WORDS
-SUBOPT_0x7:
+SUBOPT_0x6:
 	LDD  R30,Y+16
 	LDD  R31,Y+16+1
 	SBIW R30,4
@@ -2411,7 +2498,7 @@ SUBOPT_0x7:
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:3 WORDS
-SUBOPT_0x8:
+SUBOPT_0x7:
 	LDD  R26,Y+13
 	LDD  R27,Y+13+1
 	LDD  R30,Y+15
@@ -2420,7 +2507,7 @@ SUBOPT_0x8:
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:4 WORDS
-SUBOPT_0x9:
+SUBOPT_0x8:
 	LDD  R26,Y+16
 	LDD  R27,Y+16+1
 	ADIW R26,4
@@ -2432,7 +2519,7 @@ SUBOPT_0x9:
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
-SUBOPT_0xA:
+SUBOPT_0x9:
 	LDD  R26,Y+16
 	LDD  R27,Y+16+1
 	ADIW R26,4
@@ -2442,7 +2529,7 @@ SUBOPT_0xA:
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
-SUBOPT_0xB:
+SUBOPT_0xA:
 	MOVW R26,R28
 	ADIW R26,12
 	CALL __ADDW2R15

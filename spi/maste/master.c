@@ -42,7 +42,7 @@ unsigned char spi_tranceiver (unsigned char data)
     SPDR = data;                       //Load data into the buffer
     while(!(SPSR & (1<<SPIF) )){
         PORTD.1=1;
-        delay_ms(100);
+        delay_ms(300);
         PORTD.1=0;
     }       //Wait until transmission complete
     return(SPDR);                      //Return received data
@@ -204,32 +204,56 @@ PORTD.7=1;
 while (1)
       {
 
-         
-        PORTD.7=0;
-        delay_ms(200);
+      if(whichSlave==0){
+               PORTB.0=0;
+        }else{
+            if(whichSlave==1){
+                PORTB.1=0;
+            }else{
+                if(whichSlave==2){
+                   PORTB.2=0;
+                }
+            }
+        } 
+        
+        delay_ms(500);
         data = 0x00;                    //Reset ACK in "data"
         data = spi_tranceiver(ACKMaster);
         lcd_clear();
-        sprintf(lcd_show,"Transmit:%d to:%d rec:%d",ACKMaster,whichSlave,data);
+        sprintf(lcd_show,"T:%d d:%d r:%d\n",ACKMaster,whichSlave,data);
         lcd_puts(lcd_show);
         if(data%4==0){
+            delay_ms(200);
             data = 0x00;                    //Reset ACK in "data"
             data = spi_tranceiver(x);
-            sprintf(lcd_show,"Transmit:%d to:%d rec:%d",x,whichSlave,data);
+            sprintf(lcd_show,"T:%d d:%d r:%d",x,whichSlave,data);
             lcd_puts(lcd_show);
             if(data==ACKSlave){
                 x++;
                 whichSlave++;          
             }
         }
+
+
+        if(whichSlave-1==0){
+               PORTB.0=1;
+        }else{
+            if(whichSlave-1==1){
+                PORTB.1=1;
+            }else{
+                if(whichSlave-1==2){
+                   PORTB.2=1;
+                }
+            }
+        }
+
+        if(whichSlave==3){
+            whichSlave=0;
+        } 
         PORTD.0=1;
         delay_ms(100);
-        PORTD.0=0; 
-
-
-
-        PORTD.7=1;
-        delay_ms(200);
+        PORTD.0=0;  
+        delay_ms(500);
  
       }
 }
@@ -262,3 +286,9 @@ while (1)
             whichSlave=0;
         }        
 */
+ /*
+   PORTD.7=0;
+   PORTD.7=1;
+ 
+ 
+ */
