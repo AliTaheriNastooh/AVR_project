@@ -1511,28 +1511,62 @@ _main:
 	LDI  R16,LOW(2)
 ; 0000 00C7 whichSlave=0;
 	__GETWRN 20,21,0
-; 0000 00C8 DDRD.7=1;
-	SBI  0x11,7
-; 0000 00C9 PORTD.7=1;
-	SBI  0x12,7
+; 0000 00C8 DDRB.0=1;
+	SBI  0x17,0
+; 0000 00C9 PORTB.0=1;
+	SBI  0x18,0
 ; 0000 00CA while (1)
 _0x21:
 ; 0000 00CB       {
-; 0000 00CC          PORTD.7=0;
-	CBI  0x12,7
-; 0000 00CD          delay_ms(200);
+; 0000 00CC 
+; 0000 00CD 
+; 0000 00CE          if(whichSlave==0){
+	MOV  R0,R20
+	OR   R0,R21
+	BRNE _0x24
+; 0000 00CF                PORTB.0=0;
+	CBI  0x18,0
+; 0000 00D0         }else{
+	RJMP _0x27
+_0x24:
+; 0000 00D1             if(whichSlave==1){
+	LDI  R30,LOW(1)
+	LDI  R31,HIGH(1)
+	CP   R30,R20
+	CPC  R31,R21
+	BRNE _0x28
+; 0000 00D2                 PORTB.1=0;
+	CBI  0x18,1
+; 0000 00D3             }else{
+	RJMP _0x2B
+_0x28:
+; 0000 00D4                 if(whichSlave==2){
+	LDI  R30,LOW(2)
+	LDI  R31,HIGH(2)
+	CP   R30,R20
+	CPC  R31,R21
+	BRNE _0x2C
+; 0000 00D5                    PORTB.2=0;
+	CBI  0x18,2
+; 0000 00D6                 }
+; 0000 00D7             }
+_0x2C:
+_0x2B:
+; 0000 00D8         }
+_0x27:
+; 0000 00D9         delay_ms(200);
 	LDI  R26,LOW(200)
 	LDI  R27,0
 	CALL _delay_ms
-; 0000 00CE         data = 0x00;                    //Reset ACK in "data"
+; 0000 00DA         data = 0x00;                    //Reset ACK in "data"
 	LDI  R17,LOW(0)
-; 0000 00CF         data = spi_tranceiver(x);
+; 0000 00DB         data = spi_tranceiver(x);
 	MOV  R26,R16
 	RCALL _spi_tranceiver
 	MOV  R17,R30
-; 0000 00D0         lcd_clear();
+; 0000 00DC         lcd_clear();
 	RCALL _lcd_clear
-; 0000 00D1         sprintf(lcd_show,"MasterTransmit %d to %d Ack:%d",x,whichSlave,data);
+; 0000 00DD         sprintf(lcd_show,"MasterTransmit %d to %d Ack:%d",x,whichSlave,data);
 	MOVW R30,R28
 	ST   -Y,R31
 	ST   -Y,R30
@@ -1555,36 +1589,81 @@ _0x21:
 	LDI  R24,12
 	CALL _sprintf
 	ADIW R28,16
-; 0000 00D2         lcd_puts(lcd_show);
+; 0000 00DE         lcd_puts(lcd_show);
 	MOVW R26,R28
 	RCALL _lcd_puts
-; 0000 00D3         PORTD.0=1;
+; 0000 00DF         PORTD.0=1;
 	SBI  0x12,0
-; 0000 00D4         delay_ms(100);
+; 0000 00E0         delay_ms(100);
 	LDI  R26,LOW(100)
 	LDI  R27,0
 	CALL _delay_ms
-; 0000 00D5         PORTD.0=0;
+; 0000 00E1         PORTD.0=0;
 	CBI  0x12,0
-; 0000 00D6         PORTD.7=1;
-	SBI  0x12,7
-; 0000 00D7         if(data==ACK){
+; 0000 00E2         if(whichSlave==0){
+	MOV  R0,R20
+	OR   R0,R21
+	BRNE _0x33
+; 0000 00E3                PORTB.0=1;
+	SBI  0x18,0
+; 0000 00E4         }else{
+	RJMP _0x36
+_0x33:
+; 0000 00E5             if(whichSlave==1){
+	LDI  R30,LOW(1)
+	LDI  R31,HIGH(1)
+	CP   R30,R20
+	CPC  R31,R21
+	BRNE _0x37
+; 0000 00E6                 PORTB.1=1;
+	SBI  0x18,1
+; 0000 00E7             }else{
+	RJMP _0x3A
+_0x37:
+; 0000 00E8                 if(whichSlave==2){
+	LDI  R30,LOW(2)
+	LDI  R31,HIGH(2)
+	CP   R30,R20
+	CPC  R31,R21
+	BRNE _0x3B
+; 0000 00E9                    PORTB.2=1;
+	SBI  0x18,2
+; 0000 00EA                 }
+; 0000 00EB             }
+_0x3B:
+_0x3A:
+; 0000 00EC         }
+_0x36:
+; 0000 00ED         if(data==ACK){
 	CP   R19,R17
-	BRNE _0x2C
-; 0000 00D8             x++;
+	BRNE _0x3E
+; 0000 00EE             x++;
 	SUBI R16,-1
-; 0000 00D9         }
-; 0000 00DA         delay_ms(200);
-_0x2C:
+; 0000 00EF             whichSlave++;
+	__ADDWRN 20,21,1
+; 0000 00F0         }
+; 0000 00F1 
+; 0000 00F2         if(whichSlave==3){
+_0x3E:
+	LDI  R30,LOW(3)
+	LDI  R31,HIGH(3)
+	CP   R30,R20
+	CPC  R31,R21
+	BRNE _0x3F
+; 0000 00F3             whichSlave=0;
+	__GETWRN 20,21,0
+; 0000 00F4         }
+; 0000 00F5         delay_ms(200);
+_0x3F:
 	LDI  R26,LOW(200)
 	LDI  R27,0
 	CALL _delay_ms
-; 0000 00DB 
-; 0000 00DC       }
+; 0000 00F6 
+; 0000 00F7       }
 	RJMP _0x21
-; 0000 00DD }
-_0x2D:
-	RJMP _0x2D
+; 0000 00F8 }
+_0x40:
+	RJMP _0x40
 ; .FEND
 ;
 ;/*

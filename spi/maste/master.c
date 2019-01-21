@@ -197,12 +197,24 @@ DDRD.0=1;
 DDRD.1=1;
 x=2;
 whichSlave=0; 
-DDRD.7=1;
-PORTD.7=1; 
+DDRB.0=1;
+PORTB.0=1; 
 while (1)
       {
-         PORTD.7=0;
-         delay_ms(200);
+
+         
+         if(whichSlave==0){
+               PORTB.0=0;
+        }else{
+            if(whichSlave==1){
+                PORTB.1=0;
+            }else{
+                if(whichSlave==2){
+                   PORTB.2=0;
+                }
+            }
+        }
+        delay_ms(200);
         data = 0x00;                    //Reset ACK in "data"
         data = spi_tranceiver(x);
         lcd_clear();
@@ -211,9 +223,24 @@ while (1)
         PORTD.0=1;
         delay_ms(100);
         PORTD.0=0; 
-        PORTD.7=1;
+        if(whichSlave==0){
+               PORTB.0=1;
+        }else{
+            if(whichSlave==1){
+                PORTB.1=1;
+            }else{
+                if(whichSlave==2){
+                   PORTB.2=1;
+                }
+            }
+        }
         if(data==ACK){
-            x++;          
+            x++;
+            whichSlave++;          
+        }
+
+        if(whichSlave==3){
+            whichSlave=0;
         }
         delay_ms(200);
  
