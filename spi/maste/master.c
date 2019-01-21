@@ -62,9 +62,11 @@ void main(void)
 {
     unsigned char data;                 //Received data stored here
     unsigned char x = 0;
-    unsigned char ACK=22;
+    unsigned char ACKSlave=22;
+    unsigned char ACKMaster=44;
     char lcd_show[32];
     int whichSlave=0;
+    unsigned char flagToSendTemp=44;
 // Declare your local variables here
 
 // Input/Output Ports initialization
@@ -197,12 +199,42 @@ DDRD.0=1;
 DDRD.1=1;
 x=2;
 whichSlave=0; 
-DDRB.0=1;
-PORTB.0=1; 
+DDRD.7=1;
+PORTD.7=1; 
 while (1)
       {
 
          
+        PORTD.7=0;
+        delay_ms(200);
+        data = 0x00;                    //Reset ACK in "data"
+        data = spi_tranceiver(ACKMaster);
+        lcd_clear();
+        sprintf(lcd_show,"Transmit:%d to:%d rec:%d",ACKMaster,whichSlave,data);
+        lcd_puts(lcd_show);
+        if(data%4==0){
+            data = 0x00;                    //Reset ACK in "data"
+            data = spi_tranceiver(x);
+            sprintf(lcd_show,"Transmit:%d to:%d rec:%d",x,whichSlave,data);
+            lcd_puts(lcd_show);
+            if(data==ACKSlave){
+                x++;
+                whichSlave++;          
+            }
+        }
+        PORTD.0=1;
+        delay_ms(100);
+        PORTD.0=0; 
+
+
+
+        PORTD.7=1;
+        delay_ms(200);
+ 
+      }
+}
+
+/*
          if(whichSlave==0){
                PORTB.0=0;
         }else{
@@ -214,15 +246,6 @@ while (1)
                 }
             }
         }
-        delay_ms(200);
-        data = 0x00;                    //Reset ACK in "data"
-        data = spi_tranceiver(x);
-        lcd_clear();
-        sprintf(lcd_show,"MasterTransmit %d to %d Ack:%d",x,whichSlave,data);
-        lcd_puts(lcd_show);
-        PORTD.0=1;
-        delay_ms(100);
-        PORTD.0=0; 
         if(whichSlave==0){
                PORTB.0=1;
         }else{
@@ -234,60 +257,8 @@ while (1)
                 }
             }
         }
-        if(data==ACK){
-            x++;
-            whichSlave++;          
-        }
-
-        if(whichSlave==3){
-            whichSlave=0;
-        }
-        delay_ms(200);
- 
-      }
-}
-
-/*
-        delay_ms(500);              
-        if(whichSlave==0){
-               PORTB.0=1;
-        }else{
-            if(whichSlave==1){
-                PORTB.1=1;
-            }else{
-                if(whichSlave==2){
-                   PORTB.2=1;
-                }
-            }
-        }
-        delay_ms(500);
         
         if(whichSlave==3){
             whichSlave=0;
-        }
-        
-              delay_ms(500);
-        data = 0x00;                    //Reset ACK in "data"
-        data = spi_tranceiver(x);
-        if(data==ACK){
-          x++;
-          whichSlave++;
-        }else{
-          
-        }
-
-
-      // Place your code here 
-        if(whichSlave==0){
-               PORTB.0=0;
-        }else{
-            if(whichSlave==1){
-                PORTB.1=0;
-            }else{
-                if(whichSlave==2){
-                   PORTB.2=0;
-                }
-            }
-        }
-
+        }        
 */

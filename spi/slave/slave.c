@@ -44,7 +44,9 @@ Data Stack size         : 512
 void main(void)
 {
 unsigned char data_r,data_t;
-char lcd_show[16];
+char lcd_show[32];
+unsigned char ACKSlave=22;
+unsigned char ACKMaster=44;
 // Declare your local variables here
 
 // Input/Output Ports initialization
@@ -169,16 +171,27 @@ lcd_init(16);
 DDRD.0=1;
 DDRD.1=1;
 data_r=0;
-data_t=22;
+data_t=1;
 while (1)
       {
       delay_ms(200); 
       data_r=0; 
       data_r = spi_tranceiver(data_t);
-      PORTD.0=1;
-      sprintf(lcd_show,"slave=%d",data_r);
       lcd_clear();
+      sprintf(lcd_show,"recieve=%d send=%d ",data_r,data_t);
       lcd_puts(lcd_show);
+      if(data_r==ACKMaster){
+            if(data_t%4==0){
+                data_r=0; 
+                data_r = spi_tranceiver(ACKSlave); 
+                sprintf(lcd_show,"recieve=%d send=%d",data_r,data_t);
+                lcd_puts(lcd_show);
+            }
+            data_t++;
+      }
+      
+      PORTD.0=1;
+
       delay_ms(100);
       PORTD.0=0;
       delay_ms(200);
