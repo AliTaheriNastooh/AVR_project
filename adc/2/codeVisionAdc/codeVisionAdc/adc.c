@@ -50,6 +50,7 @@ return ADCW;
 void main(void)
 {
 int temp=0;
+int temp2=0;
 char lcd_show[32];
 // Declare your local variables here
 
@@ -176,7 +177,10 @@ while (1)
       // Place your code here
          temp=read_adc(0);
          temp=(((temp*1.5)/1023.0)*150)/1.5;
-         sprintf(lcd_show,"temp = %d",temp);
+         delay_ms(200);
+         temp2=read_adc(3);
+         temp2=(((temp2*1.5)/1023.0)*150)/1.5;
+         sprintf(lcd_show,"temp1 = %d \n temp2 = %d",temp,temp2);
          lcd_clear();
          lcd_puts(lcd_show);
          delay_ms(200);

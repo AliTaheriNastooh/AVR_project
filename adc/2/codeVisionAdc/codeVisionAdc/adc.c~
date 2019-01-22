@@ -24,7 +24,7 @@ Data Stack size         : 512
 #include <mega32.h>
 
 #include <delay.h>
-
+#include <stdio.h>
 // Alphanumeric LCD functions
 #include <alcd.h>
 
