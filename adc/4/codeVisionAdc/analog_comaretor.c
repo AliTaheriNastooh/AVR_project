@@ -65,7 +65,8 @@ PORTD.7=1;
    if(flag==0){
     flag=1;
     thous=0;
-    second=0;
+    second=0; 
+    read_two_temperature();
     TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
 
    }else{
