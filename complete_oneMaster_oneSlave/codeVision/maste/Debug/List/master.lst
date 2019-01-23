@@ -1,9 +1,9 @@
 
-AVRASM ver. 2.1.30  D:\university\7term\micro_graderi\project\spi\maste\Debug\List\master.asm Mon Jan 21 08:02:58 2019
+AVRASM ver. 2.1.30  D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\maste\Debug\List\master.asm Wed Jan 23 10:42:31 2019
 
-D:\university\7term\micro_graderi\project\spi\maste\Debug\List\master.asm(1088): warning: Register r5 already defined by the .DEF directive
-D:\university\7term\micro_graderi\project\spi\maste\Debug\List\master.asm(1089): warning: Register r4 already defined by the .DEF directive
-D:\university\7term\micro_graderi\project\spi\maste\Debug\List\master.asm(1090): warning: Register r7 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\maste\Debug\List\master.asm(1088): warning: Register r5 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\maste\Debug\List\master.asm(1089): warning: Register r4 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\maste\Debug\List\master.asm(1090): warning: Register r7 already defined by the .DEF directive
                  
                  
                  ;CodeVisionAVR C Compiler V3.12 Advanced
@@ -1150,7 +1150,7 @@ D:\university\7term\micro_graderi\project\spi\maste\Debug\List\master.asm(1090):
 00003c 6572
 00003d 3a63
 00003e 6425      	.DB  0x64,0x20,0x72,0x65,0x63,0x3A,0x25,0x64
-D:\university\7term\micro_graderi\project\spi\maste\Debug\List\master.asm(1131): warning: .cseg .db misalignment - padding zero byte
+D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\maste\Debug\List\master.asm(1131): warning: .cseg .db misalignment - padding zero byte
 00003f 0000      	.DB  0x0
                  _0x2000003:
 000040 c080      	.DB  0x80,0xC0
@@ -1674,27 +1674,27 @@ D:\university\7term\micro_graderi\project\spi\maste\Debug\List\master.asm(1131):
                  __lcd_write_nibble_G100:
                  ; .FSTART __lcd_write_nibble_G100
 0000fb 93aa      	ST   -Y,R26
-0000fc b3eb      	IN   R30,0x1B
+0000fc b3e5      	IN   R30,0x15
 0000fd 70ef      	ANDI R30,LOW(0xF)
 0000fe 2fae      	MOV  R26,R30
 0000ff 81e8      	LD   R30,Y
 000100 7fe0      	ANDI R30,LOW(0xF0)
 000101 2bea      	OR   R30,R26
-000102 bbeb      	OUT  0x1B,R30
+000102 bbe5      	OUT  0x15,R30
                 +
 000103 e08d     +LDI R24 , LOW ( 13 )
                 +__DELAY_USB_LOOP :
 000104 958a     +DEC R24
 000105 f7f1     +BRNE __DELAY_USB_LOOP
                  	__DELAY_USB 13
-000106 9ada      	SBI  0x1B,2
+000106 9aaa      	SBI  0x15,2
                 +
 000107 e08d     +LDI R24 , LOW ( 13 )
                 +__DELAY_USB_LOOP :
 000108 958a     +DEC R24
 000109 f7f1     +BRNE __DELAY_USB_LOOP
                  	__DELAY_USB 13
-00010a 98da      	CBI  0x1B,2
+00010a 98aa      	CBI  0x15,2
                 +
 00010b e08d     +LDI R24 , LOW ( 13 )
                 +__DELAY_USB_LOOP :
@@ -1771,10 +1771,10 @@ D:\university\7term\micro_graderi\project\spi\maste\Debug\List\master.asm(1131):
                  _0x2000007:
                  _0x2000004:
 000143 9453      	INC  R5
-000144 9ad8      	SBI  0x1B,0
+000144 9aa8      	SBI  0x15,0
 000145 81a8      	LD   R26,Y
 000146 dfc8      	RCALL __lcd_write_data
-000147 98d8      	CBI  0x1B,0
+000147 98a8      	CBI  0x15,0
 000148 c03d      	RJMP _0x20A0002
                  ; .FEND
                  _lcd_puts:
@@ -1802,15 +1802,15 @@ D:\university\7term\micro_graderi\project\spi\maste\Debug\List\master.asm(1131):
                  _lcd_init:
                  ; .FSTART _lcd_init
 00015a 93aa      	ST   -Y,R26
-00015b b3ea      	IN   R30,0x1A
+00015b b3e4      	IN   R30,0x14
 00015c 6fe0      	ORI  R30,LOW(0xF0)
-00015d bbea      	OUT  0x1A,R30
-00015e 9ad2      	SBI  0x1A,2
-00015f 9ad0      	SBI  0x1A,0
-000160 9ad1      	SBI  0x1A,1
-000161 98da      	CBI  0x1B,2
-000162 98d8      	CBI  0x1B,0
-000163 98d9      	CBI  0x1B,1
+00015d bbe4      	OUT  0x14,R30
+00015e 9aa2      	SBI  0x14,2
+00015f 9aa0      	SBI  0x14,0
+000160 9aa1      	SBI  0x14,1
+000161 98aa      	CBI  0x15,2
+000162 98a8      	CBI  0x15,0
+000163 98a9      	CBI  0x15,1
 000164 8078      	LDD  R7,Y+0
 000165 81e8      	LD   R30,Y
 000166 58e0      	SUBI R30,-LOW(128)

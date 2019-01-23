@@ -1651,17 +1651,17 @@ _0x2E:
 __lcd_write_nibble_G100:
 ; .FSTART __lcd_write_nibble_G100
 	ST   -Y,R26
-	IN   R30,0x1B
+	IN   R30,0x15
 	ANDI R30,LOW(0xF)
 	MOV  R26,R30
 	LD   R30,Y
 	ANDI R30,LOW(0xF0)
 	OR   R30,R26
-	OUT  0x1B,R30
+	OUT  0x15,R30
 	__DELAY_USB 13
-	SBI  0x1B,2
+	SBI  0x15,2
 	__DELAY_USB 13
-	CBI  0x1B,2
+	CBI  0x15,2
 	__DELAY_USB 13
 	RJMP _0x20A0002
 ; .FEND
@@ -1728,10 +1728,10 @@ _0x2000005:
 _0x2000007:
 _0x2000004:
 	INC  R5
-	SBI  0x1B,0
+	SBI  0x15,0
 	LD   R26,Y
 	RCALL __lcd_write_data
-	CBI  0x1B,0
+	CBI  0x15,0
 	RJMP _0x20A0002
 ; .FEND
 _lcd_puts:
@@ -1759,15 +1759,15 @@ _0x200000A:
 _lcd_init:
 ; .FSTART _lcd_init
 	ST   -Y,R26
-	IN   R30,0x1A
+	IN   R30,0x14
 	ORI  R30,LOW(0xF0)
-	OUT  0x1A,R30
-	SBI  0x1A,2
-	SBI  0x1A,0
-	SBI  0x1A,1
-	CBI  0x1B,2
-	CBI  0x1B,0
-	CBI  0x1B,1
+	OUT  0x14,R30
+	SBI  0x14,2
+	SBI  0x14,0
+	SBI  0x14,1
+	CBI  0x15,2
+	CBI  0x15,0
+	CBI  0x15,1
 	LDD  R7,Y+0
 	LD   R30,Y
 	SUBI R30,-LOW(128)
