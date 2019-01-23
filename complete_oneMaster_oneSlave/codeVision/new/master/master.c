@@ -51,6 +51,13 @@ interrupt [TIM1_COMPA] void timer1_compa_isr(void)
 
 
 }
+int calculate_speed(int diff){
+      if(diff>24){
+        return 6;
+      }else{
+        return diff* 0.25;
+      }
+}
 int flag=0;
 unsigned char data;
 // SPI interrupt service routine
@@ -62,10 +69,11 @@ data=SPDR;
 //lcd_puts(lcd_show);
 if(flag==0){
     tem=data;
-    if(data%5==0){ 
+    if(data!=0){ 
         flag=1;
         //sprintf(lcd_show,"t=%d",x);
         //lcd_puts(lcd_show);
+        speed=calculate_speed(data);
         delay_ms(150);
         SPDR=speed;            
         
@@ -73,7 +81,7 @@ if(flag==0){
 }else{
     flag=0;
     if(data==ACKSlave){
-        speed++;
+        //speed++;
     }
     //sprintf(lcd_show,"rec=%d",data);
     //lcd_puts(lcd_show);

@@ -1,4 +1,4 @@
-VERSION:3 SOURCE_TIMESTAMP:4E378A68
+VERSION:3 SOURCE_TIMESTAMP:4E378C5C
 NODE:I LEVEL:0 LINE:24 "C:\cvavr\inc\mega32.h"
 NODE:I LEVEL:0 LINE:25 "C:\cvavr\inc\stdio.h"
 NODE:I LEVEL:0 LINE:27 "C:\cvavr\inc\alcd.h"
@@ -11,7 +11,8 @@ NODE:V LEVEL:0 LINE:34 "ACKMaster -> R10"
 NODE:V LEVEL:0 LINE:35 "lcd_show -> RAM:????"
 NODE:F LEVEL:0 LINE:37 "send_spi(void)"
 NODE:F LEVEL:0 LINE:44 "timer1_compa_isr(void)"
-NODE:V LEVEL:0 LINE:54 "flag -> R12,R13"
-NODE:V LEVEL:0 LINE:55 "data -> RAM:????"
-NODE:F LEVEL:0 LINE:57 "spi_isr(void)"
-NODE:F LEVEL:0 LINE:86 "main(void)"
+NODE:F LEVEL:0 LINE:54 "calculate_speed(int diff)"
+NODE:V LEVEL:0 LINE:61 "flag -> R12,R13"
+NODE:V LEVEL:0 LINE:62 "data -> RAM:????"
+NODE:F LEVEL:0 LINE:64 "spi_isr(void)"
+NODE:F LEVEL:0 LINE:94 "main(void)"

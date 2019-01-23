@@ -52,6 +52,7 @@ void read_two_temperature(){
 /////////
 char lcd_show[32];
 void send_spi(){
+        tem= temp1-temp2;
         SPDR=tem; 
 }
 
@@ -88,12 +89,12 @@ interrupt [SPI_STC] void spi_isr(void)
 data=SPDR;
 if(flag1==0){
     if(data==ACKMaster){ 
-        if(tem%5==0){
+        if(tem!=0){
             flag1=1;
             delay_ms(100);
             SPDR=ACKSlave;
         }
-        tem++;
+        
     }
 }else{
     flag1=0;
@@ -118,6 +119,7 @@ PORTD.7=1;
     flag=0;
     thous=0;
     second=0;
+    read_two_temperature();
    }
 }
 

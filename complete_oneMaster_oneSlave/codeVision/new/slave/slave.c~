@@ -52,6 +52,7 @@ void read_two_temperature(){
 /////////
 char lcd_show[32];
 void send_spi(){
+        tem= temp1-temp2
         SPDR=tem; 
 }
 
@@ -88,12 +89,12 @@ interrupt [SPI_STC] void spi_isr(void)
 data=SPDR;
 if(flag1==0){
     if(data==ACKMaster){ 
-        if(tem%5==0){
+        if(tem!=0){
             flag1=1;
             delay_ms(100);
             SPDR=ACKSlave;
         }
-        tem++;
+        
     }
 }else{
     flag1=0;
@@ -118,6 +119,7 @@ PORTD.7=1;
     flag=0;
     thous=0;
     second=0;
+    read_two_temperature();
    }
 }
 
@@ -211,8 +213,8 @@ OCR1BL=0x00;
 // Output Pulse(s):
 // OC2 Period: 2.048 ms Width: 0 us
 ASSR=0<<AS2;
-//TCCR2=(1<<PWM2) | (1<<COM21) | (0<<COM20) | (1<<CTC2) | (1<<CS22) | (0<<CS21) | (0<<CS20);
-TCCR2=(1<<PWM2) | (1<<COM21) | (0<<COM20) | (1<<CTC2) | (0<<CS22) | (0<<CS21) | (0<<CS20);
+TCCR2=(1<<PWM2) | (1<<COM21) | (0<<COM20) | (1<<CTC2) | (1<<CS22) | (0<<CS21) | (0<<CS20);
+//TCCR2=(1<<PWM2) | (1<<COM21) | (0<<COM20) | (1<<CTC2) | (0<<CS22) | (0<<CS21) | (0<<CS20);
 TCNT2=0x00;
 OCR2=0x00;
 
