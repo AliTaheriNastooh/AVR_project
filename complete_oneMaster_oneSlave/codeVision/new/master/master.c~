@@ -38,8 +38,6 @@ void send_spi(){
        // lcd_clear();
         //sprintf(lcd_show,"tr=%d ",ACKMaster);
         //lcd_puts(lcd_show);
-        PORTD.7=0;
-        delay_ms(50);
         SPDR=ACKMaster;
 }
 
@@ -50,7 +48,6 @@ interrupt [TIM1_COMPA] void timer1_compa_isr(void)
         thous=0;
         send_spi();    
     }
-    
 
 
 }
@@ -69,20 +66,15 @@ if(flag==0){
         flag=1;
         //sprintf(lcd_show,"t=%d",x);
         //lcd_puts(lcd_show);
-        delay_ms(50);
+        delay_ms(100);
         SPDR=speed;            
         
-    }else{ 
-        delay_ms(50);
-         PORTD.7=1;
     }
 }else{
     flag=0;
     if(data==ACKSlave){
         speed++;
     }
-    delay_ms(50);
-    PORTD.7=1;
     //sprintf(lcd_show,"rec=%d",data);
     //lcd_puts(lcd_show);
 }
@@ -224,7 +216,7 @@ lcd_init(16);
 
 // Global enable interrupts
 #asm("sei")
-DDRD.7=1;
+
 while (1)
       {                   
          lcd_gotoxy(0,0);

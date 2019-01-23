@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.30  D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\master\Debug\List\master.asm Wed Jan 23 16:00:41 2019
+AVRASM ver. 2.1.30  D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\master\Debug\List\master.asm Wed Jan 23 17:19:33 2019
 
 D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\master\Debug\List\master.asm(1088): warning: Register r4 already defined by the .DEF directive
 D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\master\Debug\List\master.asm(1089): warning: Register r5 already defined by the .DEF directive
@@ -1389,8 +1389,8 @@ D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision
 0000a3 016f      	MOVW R12,R30
                  ; 0000 0043         //sprintf(lcd_show,"t=%d",x);
                  ; 0000 0044         //lcd_puts(lcd_show);
-                 ; 0000 0045         delay_ms(50);
-0000a4 e3a2      	LDI  R26,LOW(50)
+                 ; 0000 0045         delay_ms(150);
+0000a4 e9a6      	LDI  R26,LOW(150)
 0000a5 e0b0      	LDI  R27,0
 0000a6 940e 03c9 	CALL _delay_ms
                  ; 0000 0046         SPDR=speed;

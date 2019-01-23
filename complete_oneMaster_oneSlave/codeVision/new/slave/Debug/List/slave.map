@@ -1,12 +1,18 @@
 RAM Allocation [bytes]
 Variable                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-lcd_show                                                                          0x0260      32
-data                                                                              0x0280       1
-_base_y                                                                           0x0281       4
-_lcd_x                                                                            0x0285       1
-_lcd_y                                                                            0x0286       1
-_lcd_maxx                                                                         0x0287       1
+thous1                                                                            0x0260       2
+ACKSlave                                                                          0x0262       1
+ACKMaster                                                                         0x0263       1
+lcd_show                                                                          0x0264      32
+thous                                                                             0x0284       2
+second                                                                            0x0286       2
+flag1                                                                             0x0288       2
+data                                                                              0x028A       1
+_base_y                                                                           0x028B       4
+_lcd_x                                                                            0x028F       1
+_lcd_y                                                                            0x0290       1
+_lcd_maxx                                                                         0x0291       1
 
 EEPROM Allocation [bytes]
 Variable                                                                          Address   Size
@@ -15,30 +21,32 @@ Variable                                                                        
 Register Allocation
 Variable                                                                          Register  Size
 ------------------------------------------------------------------------------------------------
-tem                                                                               R4,R5        2
-speed                                                                             R6,R7        2
-thous1                                                                            R8,R9        2
-ACKSlave                                                                          R11          1
-ACKMaster                                                                         R10          1
-flag1                                                                             R12,R13      2
+temp1                                                                             R4,R5        2
+temp2                                                                             R6,R7        2
+flag                                                                              R8,R9        2
+tem                                                                               R10,R11      2
+speed                                                                             R12,R13      2
 
 FLASH Allocation [words]
 Function                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-send_spi                                                                          0x0007C      2
-timer0_comp_isr                                                                   0x0007E      1
-timer1_compa_isr                                                                  0x0007F     14
-spi_isr                                                                           0x0008D     51
-main                                                                              0x000C0     99
-_lcd_write_nibble_G100                                                            0x00123     20
-_lcd_write_data                                                                   0x00137     12
-lcd_gotoxy                                                                        0x00143     17
-lcd_clear                                                                         0x00154     14
-lcd_putchar                                                                       0x00162     32
-lcd_puts                                                                          0x00182     17
-lcd_init                                                                          0x00193     47
-put_buff_G101                                                                     0x001C2     64
-_print_G101                                                                       0x00202    308
-sprintf                                                                           0x00336     52
-strlen                                                                            0x0036A     12
-strlenf                                                                           0x00376     13
+read_two_temperature                                                              0x00084     17
+send_spi                                                                          0x00095      2
+timer0_comp_isr                                                                   0x00097     30
+timer1_compa_isr                                                                  0x000B5     21
+spi_isr                                                                           0x000CA     65
+ana_comp_isr                                                                      0x0010B     39
+read_adc                                                                          0x00132     14
+main                                                                              0x00140    106
+_lcd_write_nibble_G100                                                            0x001AA     20
+_lcd_write_data                                                                   0x001BE     12
+lcd_gotoxy                                                                        0x001CA     17
+lcd_clear                                                                         0x001DB     14
+lcd_putchar                                                                       0x001E9     32
+lcd_puts                                                                          0x00209     17
+lcd_init                                                                          0x0021A     47
+put_buff_G101                                                                     0x00249     58
+_print_G101                                                                       0x00283    308
+sprintf                                                                           0x003B7     52
+strlen                                                                            0x003EB     12
+strlenf                                                                           0x003F7     13

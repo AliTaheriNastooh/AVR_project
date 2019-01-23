@@ -1355,8 +1355,8 @@ _spi_isr:
 	MOVW R12,R30
 ; 0000 0043         //sprintf(lcd_show,"t=%d",x);
 ; 0000 0044         //lcd_puts(lcd_show);
-; 0000 0045         delay_ms(50);
-	LDI  R26,LOW(50)
+; 0000 0045         delay_ms(150);
+	LDI  R26,LOW(150)
 	LDI  R27,0
 	CALL _delay_ms
 ; 0000 0046         SPDR=speed;

@@ -25,22 +25,48 @@ Data Stack size         : 512
 #include <alcd.h>
 #include <delay.h>
 #include <stdio.h>
+////////////////
 
 
+unsigned int read_adc(unsigned char adc_input);
+int temp1=0;
+int temp2=0;
+int flag=0;
+//////////////////
 int tem=1;
 int speed=0;
 int thous1=0;
 unsigned char ACKSlave=22;
 unsigned char ACKMaster=44;
+///////////////////
+void read_two_temperature(){
+
+         temp1=read_adc(0);
+         temp1=(((temp1*1.5)/1023.0)*150)/1.5;
+         delay_ms(200);
+         temp2=read_adc(3);
+         temp2=(((temp2*1.5)/1023.0)*150)/1.5;
+}
+
+
+/////////
 char lcd_show[32];
 void send_spi(){
         SPDR=tem; 
 }
 
-
+int thous,second;
 interrupt [TIM0_COMP] void timer0_comp_isr(void)
 {
-// Place your code here
+              thous++;
+          if(thous==1000){
+                thous=0;
+                second++;
+                if(second==5){
+                   read_two_temperature();
+                   second=0; 
+                }
+          }
 
 }
 
@@ -55,25 +81,61 @@ interrupt [TIM1_COMPA] void timer1_compa_isr(void)
 
 }
 
-int flag=0;
+int flag1=0;
 unsigned char data;
 interrupt [SPI_STC] void spi_isr(void)
 {
 data=SPDR;
-if(flag==0){
-    if(data==ACKMaster){
-         
+if(flag1==0){
+    if(data==ACKMaster){ 
         if(tem%5==0){
-            flag=1;
-            delay_ms(50);
+            flag1=1;
+            delay_ms(100);
             SPDR=ACKSlave;
         }
         tem++;
     }
 }else{
-    flag=0;
+    flag1=0;
     speed=data;
+    OCR2=speed*(42.5);//255/6=42.5
 }
+}
+
+interrupt [ANA_COMP] void ana_comp_isr(void)
+{
+// Place your code here
+PORTD.7=1;
+   if(flag==0){
+    flag=1;
+    thous=0;
+    second=0; 
+    read_two_temperature();
+    TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
+
+   }else{
+   TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (0<<CS01) | (0<<CS00);
+    flag=0;
+    thous=0;
+    second=0;
+   }
+}
+
+// Voltage Reference: AREF pin
+#define ADC_VREF_TYPE ((0<<REFS1) | (0<<REFS0) | (0<<ADLAR))
+
+// Read the AD conversion result
+unsigned int read_adc(unsigned char adc_input)
+{
+ADMUX=adc_input | ADC_VREF_TYPE;
+// Delay needed for the stabilization of the ADC input voltage
+delay_us(10);
+// Start the AD conversion
+ADCSRA|=(1<<ADSC);
+// Wait for the AD conversion to complete
+while ((ADCSRA & (1<<ADIF))==0);
+ADCSRA|=(1<<ADIF);
+return ADCW;
 }
 
 void main(void)
@@ -175,13 +237,11 @@ UCSRB=(0<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (0<<RXEN) | (0<<TXEN) | (0<<UCSZ2) 
 // The Analog Comparator's negative input is
 // connected to the AIN1 pin
 // Analog Comparator Input Capture by Timer/Counter 1: Off
-ACSR=(0<<ACD) | (0<<ACBG) | (0<<ACO) | (0<<ACI) | (0<<ACIE) | (0<<ACIC) | (0<<ACIS1) | (0<<ACIS0);
-SFIOR=(0<<ACME);
+ACSR=(0<<ACD) | (0<<ACBG) | (0<<ACO) | (0<<ACI) | (1<<ACIE) | (0<<ACIC) | (0<<ACIS1) | (0<<ACIS0);
 
-// ADC initialization
-// ADC disabled
-ADCSRA=(0<<ADEN) | (0<<ADSC) | (0<<ADATE) | (0<<ADIF) | (0<<ADIE) | (0<<ADPS2) | (0<<ADPS1) | (0<<ADPS0);
-
+ADMUX=ADC_VREF_TYPE;
+ADCSRA=(1<<ADEN) | (0<<ADSC) | (0<<ADATE) | (0<<ADIF) | (0<<ADIE) | (1<<ADPS2) | (0<<ADPS1) | (0<<ADPS0);
+SFIOR=(0<<ADTS2) | (0<<ADTS1) | (0<<ADTS0);
 // SPI initialization
 // SPI Type: Slave
 // SPI Clock Rate: 2000.000 kHz
@@ -221,7 +281,7 @@ while (1)
       {
       // Place your code here
        lcd_gotoxy(0,0);
-       sprintf(lcd_show,"speed=%d tem=%d data=%d     ",speed,tem,data);
+       sprintf(lcd_show,"s=%dt=%d d=%d tem1=%dtem2=%d",speed,tem,data,temp1,temp2);
        lcd_puts(lcd_show);
       }
 }
