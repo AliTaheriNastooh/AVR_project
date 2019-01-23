@@ -127,8 +127,8 @@ WatchAVR8LAutoVariables=0
 UseEEPROMLocation0=1
 RebuildAll=0
 LinkageInformationPresent=1
-COFFileTimeStamp=1312250133
-Build=3
+COFFileTimeStamp=1312250644
+Build=4
 [DefinedSymbolsDebug]
 Count=0
 [Compiler]
@@ -230,7 +230,7 @@ UseEEPROMLocation0=1
 RebuildAll=1
 LinkageInformationPresent=0
 COFFileTimeStamp=-1
-Build=3
+Build=4
 [DefinedSymbols]
 Count=0
 [StartUp]
@@ -343,56 +343,43 @@ L13=Enhanced function parameters passing: Yes
 L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
-L17=Build: 2
-L18=12240 line(s) compiled
+L17=Build: 4
+L18=12283 line(s) compiled
 L19=No errors
-L20=1 warning(s)
+L20=No warnings
 L21=
 L22=Bit variables size: 0 byte(s)
 L23=
 L24=Data Stack area: 0x60 to 0x25F
 L25=Data Stack size: 512 byte(s)
-L26=Estimated Data Stack usage: 68 byte(s)
+L26=Estimated Data Stack usage: 81 byte(s)
 L27=
-L28=RAM Global variables area: 0x260 to 0x263
-L29=RAM Global variables size: 4 byte(s)
+L28=RAM Global variables area: 0x260 to 0x266
+L29=RAM Global variables size: 7 byte(s)
 L30=
-L31=Hardware Stack area: 0x264 to 0x85F
-L32=Hardware Stack size: 1532 byte(s)
+L31=Hardware Stack area: 0x267 to 0x85F
+L32=Hardware Stack size: 1529 byte(s)
 L33=
 L34=Heap size: 0 byte(s)
 L35=
 L36=EEPROM usage: 0 byte(s), 0.0% of EEPROM
-L37=Program size: 997 words (1994 bytes), 6.1% of FLASH
-L38=57 words (114 bytes), 5.4% reduced by Code Compression
+L37=Program size: 1499 words (2998 bytes), 9.1% of FLASH
+L38=96 words (192 bytes), 6.0% reduced by Code Compression
 Lines=38
 [BuildInfoAssembler]
 L1=AVRASM: AVR macro assembler 2.1.30 (build 592 Nov  7 2008 12:38:17)
 L2=Copyright (C) 1995-2008 ATMEL Corporation
 L3=
-L4=D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\slave\Debug\List\slave.asm(2536): No EEPROM data, deleting D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\slave\Debug\Exe\slave.eep
+L4=D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\slave\Debug\List\slave.asm(3142): No EEPROM data, deleting D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\slave\Debug\Exe\slave.eep
 L5=
 L6=ATmega32 memory use summary [bytes]:
 L7=Segment   Begin    End      Code   Data   Used    Size   Use%
 L8=---------------------------------------------------------------
-L9=[.cseg] 0x000000 0x0007ca   1936     58   1994   32768   6.1%
-L10=[.dseg] 0x000060 0x000264      0      4      4    2048   0.2%
+L9=[.cseg] 0x000000 0x000bb6   2922     76   2998   32768   9.1%
+L10=[.dseg] 0x000060 0x000267      0      7      7    2048   0.3%
 L11=[.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 L12=
 Lines=12
-[HeadersList]
-Files=1
-F1=D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\slave\slave.c
-[Header1]
-Files=8
-F1=C:\cvavr\inc\mega32.h
-F2=C:\cvavr\inc\mega32_bits.h
-F3=C:\cvavr\inc\delay.h
-F4=C:\cvavr\inc\stdio.h
-F5=C:\cvavr\inc\io.h
-F6=C:\cvavr\inc\stdarg.h
-F7=C:\cvavr\inc\alcd.h
-F8=C:\cvavr\inc\spi.h
 [Bookmarks0]
 Row=0
 Column=0
@@ -420,3 +407,16 @@ BK8=-1
 BK9=-1
 [FoldedCode1]
 Blocks=0
+[HeadersList]
+Files=1
+F1=D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\slave\slave.c
+[Header1]
+Files=8
+F1=C:\cvavr\inc\mega32.h
+F2=C:\cvavr\inc\mega32_bits.h
+F3=C:\cvavr\inc\delay.h
+F4=C:\cvavr\inc\stdio.h
+F5=C:\cvavr\inc\io.h
+F6=C:\cvavr\inc\stdarg.h
+F7=C:\cvavr\inc\alcd.h
+F8=C:\cvavr\inc\spi.h

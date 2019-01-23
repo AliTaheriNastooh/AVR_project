@@ -32,17 +32,53 @@ Data Stack size         : 512
 // Declare your global variables here
 
 // Timer 0 output compare interrupt service routine
+
+unsigned int read_adc(unsigned char adc_input);
+int temp1=0;
+int temp2=0;
+int flag=0;
+int thous,second;
+// Timer 0 output compare interrupt service routine
+void read_two_temperature(){
+
+         temp1=read_adc(0);
+         temp1=(((temp1*1.5)/1023.0)*150)/1.5;
+         delay_ms(200);
+         temp2=read_adc(3);
+         temp2=(((temp2*1.5)/1023.0)*150)/1.5;
+}
+
 interrupt [TIM0_COMP] void timer0_comp_isr(void)
 {
 // Place your code here
-
+              thous++;
+          if(thous==1000){
+                thous=0;
+                second++;
+                if(second==5){
+                   read_two_temperature();
+                   second=0; 
+                }
+          }
 }
 
 // Analog Comparator interrupt service routine
 interrupt [ANA_COMP] void ana_comp_isr(void)
 {
 // Place your code here
+   if(flag==0){
+    flag=1;
+    thous=0;
+    second=0; 
+    read_two_temperature();
+    TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
 
+   }else{
+   TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (0<<CS01) | (0<<CS00);
+    flag=0;
+    thous=0;
+    second=0;
+   }
 }
 
 // Voltage Reference: AREF pin
@@ -224,22 +260,29 @@ while (1)
       data_r=0; 
       data_r = spi_tranceiver(data_t);
       lcd_clear();
-      sprintf(lcd_show,"r=%d send=%d \n ",data_r,data_t);
+      sprintf(lcd_show,"t1=%dt2=%ds=%d ",temp1,temp2,second);
+      lcd_puts(lcd_show);
+      sprintf(lcd_show,"r=%dt=%d ",data_r,data_t);
       lcd_puts(lcd_show);
       if(data_r==ACKMaster){
             if(data_t%4==0){
                 data_r=0; 
                 data_r = spi_tranceiver(ACKSlave); 
-                sprintf(lcd_show,"r=%d send=%d",data_r,data_t);
+                sprintf(lcd_show,"r=%d t=%d",data_r,data_t);
                 lcd_puts(lcd_show);
             }
             data_t++;
       }
       
       PORTD.0=1;
-
       delay_ms(100);
       PORTD.0=0;
+      
+
+      
       delay_ms(200);
+      
+      
+      
       }
 }
