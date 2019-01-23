@@ -1,16 +1,16 @@
 
-AVRASM ver. 2.1.30  D:\university\7term\micro_graderi\New folder\new codevision\master\Debug\List\master.asm Wed Jan 23 15:30:50 2019
+AVRASM ver. 2.1.30  D:\university\7term\micro_graderi\project\spi_interupt\new codevision\master\Debug\List\master.asm Wed Jan 23 15:38:47 2019
 
-D:\university\7term\micro_graderi\New folder\new codevision\master\Debug\List\master.asm(1088): warning: Register r4 already defined by the .DEF directive
-D:\university\7term\micro_graderi\New folder\new codevision\master\Debug\List\master.asm(1089): warning: Register r5 already defined by the .DEF directive
-D:\university\7term\micro_graderi\New folder\new codevision\master\Debug\List\master.asm(1090): warning: Register r6 already defined by the .DEF directive
-D:\university\7term\micro_graderi\New folder\new codevision\master\Debug\List\master.asm(1091): warning: Register r7 already defined by the .DEF directive
-D:\university\7term\micro_graderi\New folder\new codevision\master\Debug\List\master.asm(1092): warning: Register r8 already defined by the .DEF directive
-D:\university\7term\micro_graderi\New folder\new codevision\master\Debug\List\master.asm(1093): warning: Register r9 already defined by the .DEF directive
-D:\university\7term\micro_graderi\New folder\new codevision\master\Debug\List\master.asm(1094): warning: Register r11 already defined by the .DEF directive
-D:\university\7term\micro_graderi\New folder\new codevision\master\Debug\List\master.asm(1095): warning: Register r10 already defined by the .DEF directive
-D:\university\7term\micro_graderi\New folder\new codevision\master\Debug\List\master.asm(1096): warning: Register r12 already defined by the .DEF directive
-D:\university\7term\micro_graderi\New folder\new codevision\master\Debug\List\master.asm(1097): warning: Register r13 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\spi_interupt\new codevision\master\Debug\List\master.asm(1088): warning: Register r4 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\spi_interupt\new codevision\master\Debug\List\master.asm(1089): warning: Register r5 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\spi_interupt\new codevision\master\Debug\List\master.asm(1090): warning: Register r6 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\spi_interupt\new codevision\master\Debug\List\master.asm(1091): warning: Register r7 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\spi_interupt\new codevision\master\Debug\List\master.asm(1092): warning: Register r8 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\spi_interupt\new codevision\master\Debug\List\master.asm(1093): warning: Register r9 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\spi_interupt\new codevision\master\Debug\List\master.asm(1094): warning: Register r11 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\spi_interupt\new codevision\master\Debug\List\master.asm(1095): warning: Register r10 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\spi_interupt\new codevision\master\Debug\List\master.asm(1096): warning: Register r12 already defined by the .DEF directive
+D:\university\7term\micro_graderi\project\spi_interupt\new codevision\master\Debug\List\master.asm(1097): warning: Register r13 already defined by the .DEF directive
                  
                  
                  ;CodeVisionAVR C Compiler V3.12 Advanced

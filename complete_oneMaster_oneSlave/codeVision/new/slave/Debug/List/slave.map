@@ -1,10 +1,12 @@
 RAM Allocation [bytes]
 Variable                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-_base_y                                                                           0x0260       4
-_lcd_x                                                                            0x0264       1
-_lcd_y                                                                            0x0265       1
-_lcd_maxx                                                                         0x0266       1
+lcd_show                                                                          0x0260      32
+data                                                                              0x0280       1
+_base_y                                                                           0x0281       4
+_lcd_x                                                                            0x0285       1
+_lcd_y                                                                            0x0286       1
+_lcd_maxx                                                                         0x0287       1
 
 EEPROM Allocation [bytes]
 Variable                                                                          Address   Size
@@ -13,30 +15,30 @@ Variable                                                                        
 Register Allocation
 Variable                                                                          Register  Size
 ------------------------------------------------------------------------------------------------
-temp1                                                                             R4,R5        2
-temp2                                                                             R6,R7        2
-flag                                                                              R8,R9        2
-thous                                                                             R10,R11      2
-second                                                                            R12,R13      2
+tem                                                                               R4,R5        2
+speed                                                                             R6,R7        2
+thous1                                                                            R8,R9        2
+ACKSlave                                                                          R11          1
+ACKMaster                                                                         R10          1
+flag1                                                                             R12,R13      2
 
 FLASH Allocation [words]
 Function                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-read_two_temperature                                                              0x0007D     15
-timer0_comp_isr                                                                   0x0008C     24
-ana_comp_isr                                                                      0x000A4     38
-read_adc                                                                          0x000CA     14
-spi_tranceiver                                                                    0x000D8     15
-main                                                                              0x000E7    132
-put_buff_G100                                                                     0x0016B     64
-_print_G100                                                                       0x001AB    308
-sprintf                                                                           0x002DF     52
-_lcd_write_nibble_G101                                                            0x00313     20
-_lcd_write_data                                                                   0x00327     12
-lcd_gotoxy                                                                        0x00333     17
-lcd_clear                                                                         0x00344     14
-lcd_putchar                                                                       0x00352     32
-lcd_puts                                                                          0x00372     17
-lcd_init                                                                          0x00383     47
-strlen                                                                            0x003B2     12
-strlenf                                                                           0x003BE     13
+send_spi                                                                          0x0007C      2
+timer0_comp_isr                                                                   0x0007E      1
+timer1_compa_isr                                                                  0x0007F     14
+spi_isr                                                                           0x0008D     51
+main                                                                              0x000C0     99
+_lcd_write_nibble_G100                                                            0x00123     20
+_lcd_write_data                                                                   0x00137     12
+lcd_gotoxy                                                                        0x00143     17
+lcd_clear                                                                         0x00154     14
+lcd_putchar                                                                       0x00162     32
+lcd_puts                                                                          0x00182     17
+lcd_init                                                                          0x00193     47
+put_buff_G101                                                                     0x001C2     64
+_print_G101                                                                       0x00202    308
+sprintf                                                                           0x00336     52
+strlen                                                                            0x0036A     12
+strlenf                                                                           0x00376     13

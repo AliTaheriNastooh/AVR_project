@@ -22,100 +22,62 @@ Data Stack size         : 512
 *******************************************************/
 
 #include <mega32.h>
-
-#include <delay.h>
+#include <alcd.h>
 #include <delay.h>
 #include <stdio.h>
-// Alphanumeric LCD functions
-#include <alcd.h>
 
-// Declare your global variables here
 
-// Timer 0 output compare interrupt service routine
-
-unsigned int read_adc(unsigned char adc_input);
-int temp1=0;
-int temp2=0;
-int flag=0;
-int thous,second;
-// Timer 0 output compare interrupt service routine
-void read_two_temperature(){
-
-         temp1=read_adc(0);
-         temp1=(((temp1*1.5)/1023.0)*150)/1.5;
-         delay_ms(200);
-         temp2=read_adc(3);
-         temp2=(((temp2*1.5)/1023.0)*150)/1.5;
+int tem=1;
+int speed=0;
+int thous1=0;
+unsigned char ACKSlave=22;
+unsigned char ACKMaster=44;
+char lcd_show[32];
+void send_spi(){
+        SPDR=tem; 
 }
+
 
 interrupt [TIM0_COMP] void timer0_comp_isr(void)
 {
 // Place your code here
-              thous++;
-          if(thous==1000){
-                thous=0;
-                second++;
-                if(second==5){
-                   read_two_temperature();
-                   second=0; 
-                }
-          }
+
 }
 
-// Analog Comparator interrupt service routine
-interrupt [ANA_COMP] void ana_comp_isr(void)
+// Timer1 output compare A interrupt service routine
+interrupt [TIM1_COMPA] void timer1_compa_isr(void)
 {
-// Place your code here
-   if(flag==0){
-    flag=1;
-    thous=0;
-    second=0; 
-    read_two_temperature();
-    TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
+    thous1++;
+    if(thous1==995){
+        thous1=0;
+        send_spi();    
+    }
 
-   }else{
-   TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (0<<CS01) | (0<<CS00);
-    flag=0;
-    thous=0;
-    second=0;
-   }
 }
 
-// Voltage Reference: AREF pin
-#define ADC_VREF_TYPE ((0<<REFS1) | (0<<REFS0) | (0<<ADLAR))
-
-// Read the AD conversion result
-unsigned int read_adc(unsigned char adc_input)
+int flag1=0;
+unsigned char data;
+interrupt [SPI_STC] void spi_isr(void)
 {
-ADMUX=adc_input | ADC_VREF_TYPE;
-// Delay needed for the stabilization of the ADC input voltage
-delay_us(10);
-// Start the AD conversion
-ADCSRA|=(1<<ADSC);
-// Wait for the AD conversion to complete
-while ((ADCSRA & (1<<ADIF))==0);
-ADCSRA|=(1<<ADIF);
-return ADCW;
+data=SPDR;
+if(flag1==0){
+    if(data==ACKMaster){
+         
+        if(tem%5==0){
+            flag1=1;
+            delay_ms(50);
+            SPDR=ACKSlave;
+        }
+        tem++;
+    }
+}else{
+    flag1=0;
+    speed=data;
 }
- unsigned char spi_tranceiver (unsigned char data)
-{
-    SPDR = data;                                  //Load data into buffer
-    while(!(SPSR & (1<<SPIF) )){
-        PORTD.1=1;
-        delay_ms(100);
-        PORTD.1=0;
-    }                  //Wait until transmission complete
-    return(SPDR);                                 //Return received data
 }
-// SPI functions
-#include <spi.h>
 
 void main(void)
 {
-unsigned char data_r,data_t;
-char lcd_show[32];
-unsigned char ACKSlave=22;
-unsigned char ACKMaster=44;
 // Declare your local variables here
 
 // Input/Output Ports initialization
@@ -149,30 +111,32 @@ PORTD=(0<<PORTD7) | (0<<PORTD6) | (0<<PORTD5) | (0<<PORTD4) | (0<<PORTD3) | (0<<
 // Mode: CTC top=OCR0
 // OC0 output: Disconnected
 // Timer Period: 1 ms
+//TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
 TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (0<<CS01) | (0<<CS00);
 TCNT0=0x00;
 OCR0=0x7C;
 
 // Timer/Counter 1 initialization
 // Clock source: System Clock
-// Clock value: Timer1 Stopped
-// Mode: Normal top=0xFFFF
+// Clock value: 8000.000 kHz
+// Mode: CTC top=OCR1A
 // OC1A output: Disconnected
 // OC1B output: Disconnected
 // Noise Canceler: Off
 // Input Capture on Falling Edge
+// Timer Period: 1 ms
 // Timer1 Overflow Interrupt: Off
 // Input Capture Interrupt: Off
-// Compare A Match Interrupt: Off
+// Compare A Match Interrupt: On
 // Compare B Match Interrupt: Off
 TCCR1A=(0<<COM1A1) | (0<<COM1A0) | (0<<COM1B1) | (0<<COM1B0) | (0<<WGM11) | (0<<WGM10);
-TCCR1B=(0<<ICNC1) | (0<<ICES1) | (0<<WGM13) | (0<<WGM12) | (0<<CS12) | (0<<CS11) | (0<<CS10);
+TCCR1B=(0<<ICNC1) | (0<<ICES1) | (0<<WGM13) | (1<<WGM12) | (0<<CS12) | (0<<CS11) | (1<<CS10);
 TCNT1H=0x00;
 TCNT1L=0x00;
 ICR1H=0x00;
 ICR1L=0x00;
-OCR1AH=0x00;
-OCR1AL=0x00;
+OCR1AH=0x1F;
+OCR1AL=0x3F;
 OCR1BH=0x00;
 OCR1BL=0x00;
 
@@ -185,12 +149,13 @@ OCR1BL=0x00;
 // Output Pulse(s):
 // OC2 Period: 2.048 ms Width: 0 us
 ASSR=0<<AS2;
-TCCR2=(1<<PWM2) | (1<<COM21) | (0<<COM20) | (1<<CTC2) | (1<<CS22) | (0<<CS21) | (0<<CS20);
+//TCCR2=(1<<PWM2) | (1<<COM21) | (0<<COM20) | (1<<CTC2) | (1<<CS22) | (0<<CS21) | (0<<CS20);
+TCCR2=(1<<PWM2) | (1<<COM21) | (0<<COM20) | (1<<CTC2) | (0<<CS22) | (0<<CS21) | (0<<CS20);
 TCNT2=0x00;
 OCR2=0x00;
 
 // Timer(s)/Counter(s) Interrupt(s) initialization
-TIMSK=(0<<OCIE2) | (0<<TOIE2) | (0<<TICIE1) | (0<<OCIE1A) | (0<<OCIE1B) | (0<<TOIE1) | (1<<OCIE0) | (0<<TOIE0);
+TIMSK=(0<<OCIE2) | (0<<TOIE2) | (0<<TICIE1) | (1<<OCIE1A) | (0<<OCIE1B) | (0<<TOIE1) | (1<<OCIE0) | (0<<TOIE0);
 
 // External Interrupt(s) initialization
 // INT0: Off
@@ -209,17 +174,13 @@ UCSRB=(0<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (0<<RXEN) | (0<<TXEN) | (0<<UCSZ2) 
 // connected to the AIN0 pin
 // The Analog Comparator's negative input is
 // connected to the AIN1 pin
-// Interrupt on Output Toggle
 // Analog Comparator Input Capture by Timer/Counter 1: Off
-ACSR=(0<<ACD) | (0<<ACBG) | (0<<ACO) | (0<<ACI) | (1<<ACIE) | (0<<ACIC) | (0<<ACIS1) | (0<<ACIS0);
+ACSR=(0<<ACD) | (0<<ACBG) | (0<<ACO) | (0<<ACI) | (0<<ACIE) | (0<<ACIC) | (0<<ACIS1) | (0<<ACIS0);
+SFIOR=(0<<ACME);
 
 // ADC initialization
-// ADC Clock frequency: 500.000 kHz
-// ADC Voltage Reference: AREF pin
-// ADC Auto Trigger Source: ADC Stopped
-ADMUX=ADC_VREF_TYPE;
-ADCSRA=(1<<ADEN) | (0<<ADSC) | (0<<ADATE) | (0<<ADIF) | (0<<ADIE) | (1<<ADPS2) | (0<<ADPS1) | (0<<ADPS0);
-SFIOR=(0<<ADTS2) | (0<<ADTS1) | (0<<ADTS0);
+// ADC disabled
+ADCSRA=(0<<ADEN) | (0<<ADSC) | (0<<ADATE) | (0<<ADIF) | (0<<ADIE) | (0<<ADPS2) | (0<<ADPS1) | (0<<ADPS0);
 
 // SPI initialization
 // SPI Type: Slave
@@ -227,8 +188,14 @@ SFIOR=(0<<ADTS2) | (0<<ADTS1) | (0<<ADTS0);
 // SPI Clock Phase: Cycle Start
 // SPI Clock Polarity: Low
 // SPI Data Order: MSB First
-SPCR=(0<<SPIE) | (1<<SPE) | (0<<DORD) | (0<<MSTR) | (0<<CPOL) | (0<<CPHA) | (0<<SPR1) | (0<<SPR0);
+SPCR=(1<<SPIE) | (1<<SPE) | (0<<DORD) | (0<<MSTR) | (0<<CPOL) | (0<<CPHA) | (0<<SPR1) | (0<<SPR0);
 SPSR=(0<<SPI2X);
+
+// Clear the SPI interrupt flag
+#asm
+    in   r30,spsr
+    in   r30,spdr
+#endasm
 
 // TWI initialization
 // TWI disabled
@@ -249,37 +216,12 @@ lcd_init(16);
 
 // Global enable interrupts
 #asm("sei")
- DDRD.0=1;
-DDRD.1=1;
-data_r=0;
-data_t=1;
+
 while (1)
       {
       // Place your code here
-           delay_ms(200); 
-      data_r=0; 
-      data_r = spi_tranceiver(data_t);
-      lcd_clear();
-      sprintf(lcd_show,"t1=%dt2=%ds=%d ",temp1,temp2,second);
-      lcd_puts(lcd_show);
-      sprintf(lcd_show,"r=%dt=%d ",data_r,data_t);
-      lcd_puts(lcd_show);
-      if(data_r==ACKMaster){
-            if(data_t%4==0){
-                data_r=0; 
-                data_r = spi_tranceiver(ACKSlave); 
-                sprintf(lcd_show,"r=%d t=%d",data_r,data_t);
-                lcd_puts(lcd_show);
-            }
-            data_t++;
-      }
-      
-      PORTD.0=1;
-      delay_ms(100);
-      PORTD.0=0; 
-      delay_ms(200);
-      
-      
-      
+       lcd_gotoxy(0,0);
+       sprintf(lcd_show,"speed=%d tem=%d data=%d     ",speed,tem,data);
+       lcd_puts(lcd_show);
       }
 }
