@@ -260,13 +260,15 @@ while (1)
       data_r=0; 
       data_r = spi_tranceiver(data_t);
       lcd_clear();
-      sprintf(lcd_show,"r=%d send=%d ",data_r,data_t);
+      sprintf(lcd_show,"t1=%dt2=%ds=%d ",temp1,temp2,second);
+      lcd_puts(lcd_show);
+      sprintf(lcd_show,"r=%dt=%d ",data_r,data_t);
       lcd_puts(lcd_show);
       if(data_r==ACKMaster){
             if(data_t%4==0){
                 data_r=0; 
                 data_r = spi_tranceiver(ACKSlave); 
-                sprintf(lcd_show,"r=%d send=%d",data_r,data_t);
+                sprintf(lcd_show,"r=%d t=%d",data_r,data_t);
                 lcd_puts(lcd_show);
             }
             data_t++;
@@ -276,8 +278,7 @@ while (1)
       delay_ms(100);
       PORTD.0=0;
       
-         sprintf(lcd_show,"t1=%d t2=%d s=%d ",temp1,temp2,second);
-         lcd_puts(lcd_show);
+
       
       delay_ms(200);
       

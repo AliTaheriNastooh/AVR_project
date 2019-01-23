@@ -276,10 +276,7 @@ while (1)
       
       PORTD.0=1;
       delay_ms(100);
-      PORTD.0=0;
-      
-
-      
+      PORTD.0=0; 
       delay_ms(200);
       
       
