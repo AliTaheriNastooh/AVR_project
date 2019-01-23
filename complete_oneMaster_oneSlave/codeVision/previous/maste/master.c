@@ -7,7 +7,7 @@ http://www.hpinfotech.com
 
 Project : 
 Version : 
-Date    : 1/22/2019
+Date    : 1/20/2019
 Author  : 
 Company : 
 Comments: 
@@ -25,31 +25,50 @@ Data Stack size         : 512
 
 // Alphanumeric LCD functions
 #include <alcd.h>
-#include <stdio.h>
 #include <delay.h>
 // Declare your global variables here
 
-// External Interrupt 0 service routine
-interrupt [EXT_INT0] void ext_int0_isr(void)
+// SPI functions
+#include <spi.h>
+#include <stdio.h>
+void spi_init_master (void)
 {
-// Place your code here
-   if(OCR2<0xF0)
-    OCR2 +=0x0F;
+    DDRB = (1<<5)|(1<<3);              //Set MOSI, SCK as Output
+    SPCR = (1<<SPE)|(1<<MSTR); //Enable SPI, Set as Master
+                                       //Prescaler: Fosc/16, Enable Interrupts
 }
-
-// External Interrupt 1 service routine
-interrupt [EXT_INT1] void ext_int1_isr(void)
+unsigned char spi_tranceiver (unsigned char data)
 {
-// Place your code here
-    if(OCR2>0x0F){
-        OCR2 -= 0x0F;
+    SPDR = data;                       //Load data into the buffer
+    while(!(SPSR & (1<<SPIF) )){
+        PORTD.1=1;
+        delay_ms(100);
+        PORTD.1=0;
+    }       //Wait until transmission complete
+    return(SPDR);                      //Return received data
+}
+void led_blink (unsigned char i)
+{
+    //Blink LED "i" number of times
+    for (; i>0; --i)
+    {
+        PORTD|=(1<<0);
+        delay_ms(100);
+        PORTD=(0<<0);
+        delay_ms(100);
     }
 }
-
 void main(void)
 {
+    unsigned char data;                 //Received data stored here
+    unsigned char x = 0;
+    unsigned char ACKSlave=22;
+    unsigned char ACKMaster=44;
+    char lcd_show[32];
+    int whichSlave=0;
+    unsigned char flagToSendTemp=44;
 // Declare your local variables here
- char lcd_show[32];
+
 // Input/Output Ports initialization
 // Port A initialization
 // Function: Bit7=In Bit6=In Bit5=In Bit4=In Bit3=In Bit2=In Bit1=In Bit0=In 
@@ -58,9 +77,9 @@ DDRA=(0<<DDA7) | (0<<DDA6) | (0<<DDA5) | (0<<DDA4) | (0<<DDA3) | (0<<DDA2) | (0<
 PORTA=(0<<PORTA7) | (0<<PORTA6) | (0<<PORTA5) | (0<<PORTA4) | (0<<PORTA3) | (0<<PORTA2) | (0<<PORTA1) | (0<<PORTA0);
 
 // Port B initialization
-// Function: Bit7=In Bit6=In Bit5=In Bit4=In Bit3=In Bit2=In Bit1=In Bit0=In 
-DDRB=(0<<DDB7) | (0<<DDB6) | (0<<DDB5) | (0<<DDB4) | (0<<DDB3) | (0<<DDB2) | (0<<DDB1) | (0<<DDB0);
-// State: Bit7=T Bit6=T Bit5=T Bit4=T Bit3=T Bit2=T Bit1=T Bit0=T 
+// Function: Bit7=Out Bit6=In Bit5=Out Bit4=Out Bit3=In Bit2=In Bit1=In Bit0=In 
+DDRB=(1<<DDB7) | (0<<DDB6) | (1<<DDB5) | (1<<DDB4) | (0<<DDB3) | (0<<DDB2) | (0<<DDB1) | (0<<DDB0);
+// State: Bit7=0 Bit6=T Bit5=0 Bit4=0 Bit3=T Bit2=T Bit1=T Bit0=T 
 PORTB=(0<<PORTB7) | (0<<PORTB6) | (0<<PORTB5) | (0<<PORTB4) | (0<<PORTB3) | (0<<PORTB2) | (0<<PORTB1) | (0<<PORTB0);
 
 // Port C initialization
@@ -70,9 +89,9 @@ DDRC=(0<<DDC7) | (0<<DDC6) | (0<<DDC5) | (0<<DDC4) | (0<<DDC3) | (0<<DDC2) | (0<
 PORTC=(0<<PORTC7) | (0<<PORTC6) | (0<<PORTC5) | (0<<PORTC4) | (0<<PORTC3) | (0<<PORTC2) | (0<<PORTC1) | (0<<PORTC0);
 
 // Port D initialization
-// Function: Bit7=Out Bit6=In Bit5=In Bit4=In Bit3=In Bit2=In Bit1=In Bit0=In 
-DDRD=(1<<DDD7) | (0<<DDD6) | (0<<DDD5) | (0<<DDD4) | (0<<DDD3) | (0<<DDD2) | (0<<DDD1) | (0<<DDD0);
-// State: Bit7=0 Bit6=T Bit5=T Bit4=T Bit3=T Bit2=T Bit1=T Bit0=T 
+// Function: Bit7=In Bit6=In Bit5=In Bit4=In Bit3=In Bit2=In Bit1=In Bit0=In 
+DDRD=(0<<DDD7) | (0<<DDD6) | (0<<DDD5) | (0<<DDD4) | (0<<DDD3) | (0<<DDD2) | (0<<DDD1) | (0<<DDD0);
+// State: Bit7=T Bit6=T Bit5=T Bit4=T Bit3=T Bit2=T Bit1=T Bit0=T 
 PORTD=(0<<PORTD7) | (0<<PORTD6) | (0<<PORTD5) | (0<<PORTD4) | (0<<PORTD3) | (0<<PORTD2) | (0<<PORTD1) | (0<<PORTD0);
 
 // Timer/Counter 0 initialization
@@ -109,30 +128,23 @@ OCR1BL=0x00;
 
 // Timer/Counter 2 initialization
 // Clock source: System Clock
-// Clock value: 125.000 kHz
-// Mode: Fast PWM top=0xFF
-// OC2 output: Non-Inverted PWM
-// Timer Period: 2.048 ms
-// Output Pulse(s):
-// OC2 Period: 2.048 ms Width: 0.016063 ms
+// Clock value: Timer2 Stopped
+// Mode: Normal top=0xFF
+// OC2 output: Disconnected
 ASSR=0<<AS2;
-TCCR2=(1<<PWM2) | (1<<COM21) | (0<<COM20) | (1<<CTC2) | (1<<CS22) | (0<<CS21) | (0<<CS20);
+TCCR2=(0<<PWM2) | (0<<COM21) | (0<<COM20) | (0<<CTC2) | (0<<CS22) | (0<<CS21) | (0<<CS20);
 TCNT2=0x00;
-OCR2=0x02;
+OCR2=0x00;
 
 // Timer(s)/Counter(s) Interrupt(s) initialization
 TIMSK=(0<<OCIE2) | (0<<TOIE2) | (0<<TICIE1) | (0<<OCIE1A) | (0<<OCIE1B) | (0<<TOIE1) | (0<<OCIE0) | (0<<TOIE0);
 
 // External Interrupt(s) initialization
-// INT0: On
-// INT0 Mode: Rising Edge
-// INT1: On
-// INT1 Mode: Rising Edge
+// INT0: Off
+// INT1: Off
 // INT2: Off
-GICR|=(1<<INT1) | (1<<INT0) | (0<<INT2);
-MCUCR=(1<<ISC11) | (1<<ISC10) | (1<<ISC01) | (1<<ISC00);
+MCUCR=(0<<ISC11) | (0<<ISC10) | (0<<ISC01) | (0<<ISC00);
 MCUCSR=(0<<ISC2);
-GIFR=(1<<INTF1) | (1<<INTF0) | (0<<INTF2);
 
 // USART initialization
 // USART disabled
@@ -152,8 +164,13 @@ SFIOR=(0<<ACME);
 ADCSRA=(0<<ADEN) | (0<<ADSC) | (0<<ADATE) | (0<<ADIF) | (0<<ADIE) | (0<<ADPS2) | (0<<ADPS1) | (0<<ADPS0);
 
 // SPI initialization
-// SPI disabled
-SPCR=(0<<SPIE) | (0<<SPE) | (0<<DORD) | (0<<MSTR) | (0<<CPOL) | (0<<CPHA) | (0<<SPR1) | (0<<SPR0);
+// SPI Type: Master
+// SPI Clock Rate: 2000.000 kHz
+// SPI Clock Phase: Cycle Start
+// SPI Clock Polarity: Low
+// SPI Data Order: MSB First
+SPCR=(0<<SPIE) | (1<<SPE) | (0<<DORD) | (1<<MSTR) | (0<<CPOL) | (0<<CPHA) | (0<<SPR1) | (0<<SPR0);
+SPSR=(0<<SPI2X);
 
 // TWI initialization
 // TWI disabled
@@ -171,16 +188,77 @@ TWCR=(0<<TWEA) | (0<<TWSTA) | (0<<TWSTO) | (0<<TWEN) | (0<<TWIE);
 // D7 - PORTA Bit 7
 // Characters/line: 16
 lcd_init(16);
-
-// Global enable interrupts
-#asm("sei")
-
+//spi_init_master();
+DDRB.0=1;
+DDRB.1=1;
+DDRB.2=1;
+PORTB.0=1;
+PORTB.1=1;
+PORTB.2=1;
+DDRD.0=1; 
+DDRD.1=1;
+x=2;
+whichSlave=0; 
+DDRD.7=1;
+PORTD.7=1; 
 while (1)
       {
-      // Place your code here
-       sprintf(lcd_show,"%d",OCR2);
-       lcd_clear();
-       lcd_puts(lcd_show);
-       delay_ms(100);
+
+         
+        PORTD.7=0;
+        delay_ms(200);
+        data = 0x00;                    //Reset ACK in "data"
+        data = spi_tranceiver(ACKMaster);
+        lcd_clear();
+        sprintf(lcd_show,"T:%d to:%d r:%d\n",ACKMaster,whichSlave,data);
+        lcd_puts(lcd_show);
+        if(data%4==0){
+            data = 0x00;                    //Reset ACK in "data"
+            data = spi_tranceiver(x);
+            sprintf(lcd_show,"T:%d to:%d r:%d",x,whichSlave,data);
+            lcd_puts(lcd_show);
+            if(data==ACKSlave){
+                x++;
+                whichSlave++;          
+            }
+        }
+        PORTD.0=1;
+        delay_ms(100);
+        PORTD.0=0; 
+
+
+
+        PORTD.7=1;
+        delay_ms(200);
+ 
       }
 }
+
+/*
+         if(whichSlave==0){
+               PORTB.0=0;
+        }else{
+            if(whichSlave==1){
+                PORTB.1=0;
+            }else{
+                if(whichSlave==2){
+                   PORTB.2=0;
+                }
+            }
+        }
+        if(whichSlave==0){
+               PORTB.0=1;
+        }else{
+            if(whichSlave==1){
+                PORTB.1=1;
+            }else{
+                if(whichSlave==2){
+                   PORTB.2=1;
+                }
+            }
+        }
+        
+        if(whichSlave==3){
+            whichSlave=0;
+        }        
+*/
