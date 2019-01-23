@@ -74,7 +74,7 @@ if(flag==0){
         //sprintf(lcd_show,"t=%d",x);
         //lcd_puts(lcd_show);
         speed=calculate_speed(data);
-        delay_ms(150);
+        delay_ms(100);
         SPDR=speed;            
         
     }

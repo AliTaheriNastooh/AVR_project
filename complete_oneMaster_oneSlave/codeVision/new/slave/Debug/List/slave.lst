@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.30  D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\slave\Debug\List\slave.asm Wed Jan 23 17:28:57 2019
+AVRASM ver. 2.1.30  D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\slave\Debug\List\slave.asm Wed Jan 23 17:41:48 2019
 
 D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\slave\Debug\List\slave.asm(1088): warning: Register r4 already defined by the .DEF directive
 D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision\new\slave\Debug\List\slave.asm(1089): warning: Register r5 already defined by the .DEF directive
@@ -1480,8 +1480,8 @@ D:\university\7term\micro_graderi\project\complete_oneMaster_oneSlave\codeVision
 0000e3 e0f0      	LDI  R31,HIGH(1)
 0000e4 93e0 0288 	STS  _flag1,R30
 0000e6 93f0 0289 	STS  _flag1+1,R31
-                 ; 0000 005E             delay_ms(100);
-0000e8 e6a4      	LDI  R26,LOW(100)
+                 ; 0000 005E             delay_ms(10);
+0000e8 e0aa      	LDI  R26,LOW(10)
 0000e9 e0b0      	LDI  R27,0
 0000ea 940e 0483 	CALL _delay_ms
                  ; 0000 005F             SPDR=ACKSlave;

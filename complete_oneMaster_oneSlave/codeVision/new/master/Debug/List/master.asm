@@ -1385,8 +1385,8 @@ _spi_isr:
 	CLR  R27
 	RCALL _calculate_speed
 	MOVW R4,R30
-; 0000 004D         delay_ms(150);
-	LDI  R26,LOW(150)
+; 0000 004D         delay_ms(100);
+	LDI  R26,LOW(100)
 	LDI  R27,0
 	CALL _delay_ms
 ; 0000 004E         SPDR=speed;

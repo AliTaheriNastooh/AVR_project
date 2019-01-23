@@ -81,7 +81,7 @@ if(flag==0){
 }else{
     flag=0;
     if(data==ACKSlave){
-        speed++;
+        //speed++;
     }
     //sprintf(lcd_show,"rec=%d",data);
     //lcd_puts(lcd_show);

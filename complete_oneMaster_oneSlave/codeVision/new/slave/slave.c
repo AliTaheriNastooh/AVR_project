@@ -91,7 +91,7 @@ if(flag1==0){
     if(data==ACKMaster){ 
         if(tem!=0){
             flag1=1;
-            delay_ms(100);
+            delay_ms(10);
             SPDR=ACKSlave;
         }
         

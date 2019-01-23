@@ -1444,8 +1444,8 @@ _spi_isr:
 	LDI  R31,HIGH(1)
 	STS  _flag1,R30
 	STS  _flag1+1,R31
-; 0000 005E             delay_ms(100);
-	LDI  R26,LOW(100)
+; 0000 005E             delay_ms(10);
+	LDI  R26,LOW(10)
 	LDI  R27,0
 	CALL _delay_ms
 ; 0000 005F             SPDR=ACKSlave;
