@@ -1,0 +1,43 @@
+RAM Allocation [bytes]
+Variable                                                                          Address   Size
+------------------------------------------------------------------------------------------------
+lcd_show                                                                          0x0260      32
+data                                                                              0x0280       1
+_base_y                                                                           0x0281       4
+_lcd_x                                                                            0x0285       1
+_lcd_y                                                                            0x0286       1
+_lcd_maxx                                                                         0x0287       1
+
+EEPROM Allocation [bytes]
+Variable                                                                          Address   Size
+------------------------------------------------------------------------------------------------
+
+Register Allocation
+Variable                                                                          Register  Size
+------------------------------------------------------------------------------------------------
+speed                                                                             R4,R5        2
+tem                                                                               R6,R7        2
+thous                                                                             R8,R9        2
+ACKSlave                                                                          R11          1
+ACKMaster                                                                         R10          1
+flag                                                                              R12,R13      2
+
+FLASH Allocation [words]
+Function                                                                          Address   Size
+------------------------------------------------------------------------------------------------
+send_spi                                                                          0x0007D      7
+timer1_compa_isr                                                                  0x00084     14
+spi_isr                                                                           0x000AC     49
+main                                                                              0x000DD     98
+put_buff_G100                                                                     0x0013F     64
+_print_G100                                                                       0x0017F    308
+sprintf                                                                           0x002B3     52
+_lcd_write_nibble_G101                                                            0x002E7     20
+_lcd_write_data                                                                   0x002FB     12
+lcd_gotoxy                                                                        0x00307     17
+lcd_clear                                                                         0x00318     14
+lcd_putchar                                                                       0x00326     32
+lcd_puts                                                                          0x00346     17
+lcd_init                                                                          0x00357     47
+strlen                                                                            0x00386     12
+strlenf                                                                           0x00392     13
