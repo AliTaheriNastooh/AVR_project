@@ -53,7 +53,8 @@ void read_two_temperature(){
 char lcd_show[32];
 void send_spi(){
         tem= temp1-temp2;
-        //delay_ms(100);
+        //delay_ms(100); 
+         if(tem<0)tem=0;
         SPDR=tem; 
 }
 
@@ -113,6 +114,9 @@ if(flag1==0){
             flag1=1;
             delay_ms(10);
             SPDR=ACKSlave;
+        }else{
+            speed=0;
+            OCR2=0;
         }
         
     }
@@ -133,7 +137,9 @@ PORTD.7=1;
     second=0; 
     read_two_temperature();
     TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
-
+      
+    
+    
    }else{
    TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (0<<CS01) | (0<<CS00);
     flag=0;

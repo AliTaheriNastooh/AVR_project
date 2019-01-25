@@ -46,14 +46,18 @@ void read_two_temperature(){
          delay_ms(200);
          temp2=read_adc(3);
          temp2=(((temp2*1.5)/1023.0)*150)/1.5;
+         
 }
 
 
 /////////
 char lcd_show[32];
 void send_spi(){
-        tem= temp1-temp2;
+        tem= temp2-temp1;
         //delay_ms(100);
+        if(tem<0){
+            tem=0;
+        }
         SPDR=tem; 
 }
 
@@ -112,6 +116,9 @@ if(flag1==0){
             flag1=1;
             delay_ms(10);
             SPDR=ACKSlave;
+        }else{
+            speed=0;
+            OCR2=0;
         }
         
     }
@@ -127,18 +134,17 @@ interrupt [ANA_COMP] void ana_comp_isr(void)
 // Place your code here
 PORTD.7=1;
    if(flag==0){
+     TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (0<<CS01) | (0<<CS00);
     flag=1;
+    thous=0;
+    second=0;
+    read_two_temperature();  
+   }else{
+       flag=0;
     thous=0;
     second=0; 
     read_two_temperature();
     TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
-
-   }else{
-   TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (0<<CS01) | (0<<CS00);
-    flag=0;
-    thous=0;
-    second=0;
-    read_two_temperature();
    }
 }
 
@@ -195,7 +201,7 @@ PORTD=(0<<PORTD7) | (0<<PORTD6) | (0<<PORTD5) | (0<<PORTD4) | (0<<PORTD3) | (0<<
 // OC0 output: Disconnected
 // Timer Period: 1 ms
 //TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
-TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (0<<CS01) | (0<<CS00);
+TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
 TCNT0=0x00;
 OCR0=0x7C;
 
@@ -297,7 +303,7 @@ lcd_init(16);
 
 // Global enable interrupts
 #asm("sei")
-
+read_two_temperature();
 while (1)
       {
       // Place your code here

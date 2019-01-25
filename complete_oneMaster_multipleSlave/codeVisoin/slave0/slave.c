@@ -55,6 +55,7 @@ char lcd_show[32];
 void send_spi(){
         tem= temp1-temp2;
         //delay_ms(100);
+        if(tem<0)tem=0;
         SPDR=tem; 
 }
 
@@ -107,6 +108,9 @@ if(flag1==0){
             flag1=1;
             delay_ms(10);
             SPDR=ACKSlave;
+        }else{
+            speed=0;
+            OCR2=0;
         }
         
     }
@@ -120,7 +124,7 @@ if(flag1==0){
 interrupt [ANA_COMP] void ana_comp_isr(void)
 {
 // Place your code here
-PORTD.7=1;
+//PORTD.7=1;
    if(flag==0){
     flag=1;
     thous=0;

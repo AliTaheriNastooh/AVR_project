@@ -46,14 +46,18 @@ void read_two_temperature(){
          delay_ms(200);
          temp2=read_adc(3);
          temp2=(((temp2*1.5)/1023.0)*150)/1.5;
+         
 }
 
 
 /////////
 char lcd_show[32];
 void send_spi(){
-        tem= temp1-temp2;
+        tem= temp2-temp1;
         //delay_ms(100);
+        if(tem<0){
+            tem=0;
+        }
         SPDR=tem; 
 }
 
@@ -71,14 +75,32 @@ interrupt [TIM0_COMP] void timer0_comp_isr(void)
           }
 
 }
-
+int min1=0;
+int flag_timer_spi=0;
 // Timer1 output compare A interrupt service routine
 interrupt [TIM1_COMPA] void timer1_compa_isr(void)
 {
     thous1++;
-    if(thous1==995){
+    if(thous1==1000){
+        min1++;
+        if(flag_timer_spi==0){
+            if(min1==3){
+                send_spi();
+                min1=0;
+                flag_timer_spi=1;    
+            }else{
+                
+            }
+        }else{
+            if(min1==3){
+            
+            send_spi();
+            min1=0;
+            }
+        }
+        
         thous1=0;
-        send_spi();    
+            
     }
 
 }
@@ -94,6 +116,9 @@ if(flag1==0){
             flag1=1;
             delay_ms(10);
             SPDR=ACKSlave;
+        }else{
+            speed=0;
+            OCR2=0;
         }
         
     }
@@ -109,18 +134,17 @@ interrupt [ANA_COMP] void ana_comp_isr(void)
 // Place your code here
 PORTD.7=1;
    if(flag==0){
+     TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (0<<CS01) | (0<<CS00);
     flag=1;
+    thous=0;
+    second=0;
+    read_two_temperature();  
+   }else{
+       flag=0;
     thous=0;
     second=0; 
     read_two_temperature();
     TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
-
-   }else{
-   TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (0<<CS01) | (0<<CS00);
-    flag=0;
-    thous=0;
-    second=0;
-    read_two_temperature();
    }
 }
 
@@ -177,7 +201,7 @@ PORTD=(0<<PORTD7) | (0<<PORTD6) | (0<<PORTD5) | (0<<PORTD4) | (0<<PORTD3) | (0<<
 // OC0 output: Disconnected
 // Timer Period: 1 ms
 //TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
-TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (0<<CS01) | (0<<CS00);
+TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
 TCNT0=0x00;
 OCR0=0x7C;
 
@@ -286,5 +310,6 @@ while (1)
        lcd_gotoxy(0,0);
        sprintf(lcd_show,"s=%dt=%d d=%d tem1=%dtem2=%d",speed,tem,data,temp1,temp2);
        lcd_puts(lcd_show);
+	   delay_ms(50);
       }
 }

@@ -55,6 +55,7 @@ char lcd_show[32];
 void send_spi(){
         tem= temp1-temp2;
         //delay_ms(100);
+        if(tem<0)tem=0;
         SPDR=tem; 
 }
 
@@ -107,6 +108,9 @@ if(flag1==0){
             flag1=1;
             delay_ms(10);
             SPDR=ACKSlave;
+        }else{
+            speed=0;
+            OCR2=0;
         }
         
     }
@@ -297,7 +301,7 @@ while (1)
       {
       // Place your code here
        lcd_gotoxy(0,0);
-       sprintf(lcd_show,"s=%dt=%d d=%d tem1=%dtem2=%dmin=%d",speed,tem,data,temp1,temp2,min1);
+       sprintf(lcd_show,"s=%dt=%d d=%d tem1=%dmin=%d",speed,tem,data,temp1,min1);
        lcd_puts(lcd_show);
 	   delay_ms(50);
       }

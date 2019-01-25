@@ -53,7 +53,8 @@ void read_two_temperature(){
 char lcd_show[32];
 void send_spi(){
         tem= temp1-temp2;
-        //delay_ms(100);
+        //delay_ms(100); 
+         if(tem<0)tem=0;
         SPDR=tem; 
 }
 
@@ -78,10 +79,10 @@ int flag_timer_spi=0;
 interrupt [TIM1_COMPA] void timer1_compa_isr(void)
 {
     thous1++;
-    if(thous1==995){
+    if(thous1==1000){
         min1++;
         if(flag_timer_spi==0){
-            if(min1==1){
+            if(min1==2){
                 send_spi();
                 min1=0;
                 flag_timer_spi=1;    
@@ -113,6 +114,8 @@ if(flag1==0){
             flag1=1;
             delay_ms(10);
             SPDR=ACKSlave;
+        }else{
+            speed=0;
         }
         
     }
@@ -133,7 +136,9 @@ PORTD.7=1;
     second=0; 
     read_two_temperature();
     TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (1<<CS01) | (1<<CS00);
-
+      
+    
+    
    }else{
    TCCR0=(0<<WGM00) | (0<<COM01) | (0<<COM00) | (1<<WGM01) | (0<<CS02) | (0<<CS01) | (0<<CS00);
     flag=0;
@@ -305,5 +310,6 @@ while (1)
        lcd_gotoxy(0,0);
        sprintf(lcd_show,"s=%dt=%d d=%d tem1=%dtem2=%d",speed,tem,data,temp1,temp2);
        lcd_puts(lcd_show);
+	   delay_ms(50);
       }
 }
