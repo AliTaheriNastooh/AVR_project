@@ -1270,19 +1270,12 @@ _spi_tranceiver:
 	OUT  0xF,R30
 ; 0000 0025     while(!(SPSR & (1<<SPIF) )){
 _0x3:
-	SBIC 0xE,7
-	RJMP _0x5
-; 0000 0026         PORTD.1=1;
-	SBI  0x12,1
-; 0000 0027         delay_ms(300);
-	LDI  R26,LOW(300)
-	LDI  R27,HIGH(300)
-	CALL _delay_ms
-; 0000 0028         PORTD.1=0;
-	CBI  0x12,1
+	SBIS 0xE,7
+; 0000 0026         //PORTD.1=1;
+; 0000 0027         //delay_ms(300);
+; 0000 0028         //PORTD.1=0;
 ; 0000 0029     }                  //Wait until transmission complete
 	RJMP _0x3
-_0x5:
 ; 0000 002A 
 ; 0000 002B     return(SPDR);                                 //Return received data
 	IN   R30,0xF
@@ -1479,7 +1472,7 @@ _main:
 ; 0000 00AF data_t=1;
 	LDI  R16,LOW(1)
 ; 0000 00B0 while (1)
-_0xE:
+_0xA:
 ; 0000 00B1       {
 ; 0000 00B2 
 ; 0000 00B3 
@@ -1510,7 +1503,7 @@ _0xE:
 ; 0000 00B9       lcd_puts(lcd_show);
 ; 0000 00BA       if(data_r==ACKMaster){
 	CP   R18,R17
-	BRNE _0x11
+	BRNE _0xD
 ; 0000 00BB             if(data_t%4==0){
 	MOV  R26,R16
 	CLR  R27
@@ -1518,7 +1511,7 @@ _0xE:
 	LDI  R31,HIGH(4)
 	CALL __MODW21
 	SBIW R30,0
-	BRNE _0x12
+	BRNE _0xE
 ; 0000 00BC                 delay_ms(200);
 	LDI  R26,LOW(200)
 	LDI  R27,0
@@ -1544,12 +1537,12 @@ _0xE:
 ; 0000 00C0                 lcd_puts(lcd_show);
 ; 0000 00C1             }
 ; 0000 00C2             data_t++;
-_0x12:
+_0xE:
 	SUBI R16,-1
 ; 0000 00C3       }
 ; 0000 00C4 
 ; 0000 00C5       PORTD.0=1;
-_0x11:
+_0xD:
 	SBI  0x12,0
 ; 0000 00C6 
 ; 0000 00C7       delay_ms(100);
@@ -1565,10 +1558,10 @@ _0x11:
 ; 0000 00CA       // Place your code here
 ; 0000 00CB 
 ; 0000 00CC       }
-	RJMP _0xE
+	RJMP _0xA
 ; 0000 00CD }
-_0x17:
-	RJMP _0x17
+_0x13:
+	RJMP _0x13
 ; .FEND
 	#ifndef __SLEEP_DEFINED__
 	#define __SLEEP_DEFINED__

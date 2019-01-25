@@ -1277,19 +1277,12 @@ _spi_tranceiver:
 	OUT  0xF,R30
 ; 0000 002B     while(!(SPSR & (1<<SPIF) )){
 _0x3:
-	SBIC 0xE,7
-	RJMP _0x5
-; 0000 002C         PORTD.1=1;
-	SBI  0x12,1
-; 0000 002D         delay_ms(300);
-	LDI  R26,LOW(300)
-	LDI  R27,HIGH(300)
-	CALL _delay_ms
-; 0000 002E         PORTD.1=0;
-	CBI  0x12,1
+	SBIS 0xE,7
+; 0000 002C         //PORTD.1=1;
+; 0000 002D         //delay_ms(300);
+; 0000 002E         //PORTD.1=0;
 ; 0000 002F     }       //Wait until transmission complete
 	RJMP _0x3
-_0x5:
 ; 0000 0030     return(SPDR);                      //Return received data
 	IN   R30,0xF
 	RJMP _0x20A0002
@@ -1523,43 +1516,43 @@ _main:
 ; 0000 00CB PORTD.7=1;
 	SBI  0x12,7
 ; 0000 00CC while (1)
-_0x21:
+_0x1D:
 ; 0000 00CD       {
 ; 0000 00CE 
 ; 0000 00CF       if(whichSlave==0){
 	MOV  R0,R20
 	OR   R0,R21
-	BRNE _0x24
+	BRNE _0x20
 ; 0000 00D0                PORTB.0=0;
 	CBI  0x18,0
 ; 0000 00D1         }else{
-	RJMP _0x27
-_0x24:
+	RJMP _0x23
+_0x20:
 ; 0000 00D2             if(whichSlave==1){
 	LDI  R30,LOW(1)
 	LDI  R31,HIGH(1)
 	CP   R30,R20
 	CPC  R31,R21
-	BRNE _0x28
+	BRNE _0x24
 ; 0000 00D3                 PORTB.1=0;
 	CBI  0x18,1
 ; 0000 00D4             }else{
-	RJMP _0x2B
-_0x28:
+	RJMP _0x27
+_0x24:
 ; 0000 00D5                 if(whichSlave==2){
 	LDI  R30,LOW(2)
 	LDI  R31,HIGH(2)
 	CP   R30,R20
 	CPC  R31,R21
-	BRNE _0x2C
+	BRNE _0x28
 ; 0000 00D6                    PORTB.2=0;
 	CBI  0x18,2
 ; 0000 00D7                 }
 ; 0000 00D8             }
-_0x2C:
-_0x2B:
-; 0000 00D9         }
+_0x28:
 _0x27:
+; 0000 00D9         }
+_0x23:
 ; 0000 00DA 
 ; 0000 00DB         delay_ms(500);
 	LDI  R26,LOW(500)
@@ -1593,7 +1586,7 @@ _0x27:
 	LDI  R31,HIGH(4)
 	CALL __MODW21
 	SBIW R30,0
-	BRNE _0x2F
+	BRNE _0x2B
 ; 0000 00E2             delay_ms(200);
 	LDI  R26,LOW(200)
 	LDI  R27,0
@@ -1619,65 +1612,65 @@ _0x27:
 ; 0000 00E6             lcd_puts(lcd_show);
 ; 0000 00E7             if(data==ACKSlave){
 	CP   R19,R17
-	BRNE _0x30
+	BRNE _0x2C
 ; 0000 00E8                 x++;
 	SUBI R16,-1
 ; 0000 00E9                 whichSlave++;
 	__ADDWRN 20,21,1
 ; 0000 00EA             }
 ; 0000 00EB         }
-_0x30:
+_0x2C:
 ; 0000 00EC 
 ; 0000 00ED 
 ; 0000 00EE         if(whichSlave-1==0){
-_0x2F:
+_0x2B:
 	MOVW R30,R20
 	SBIW R30,1
-	BRNE _0x31
+	BRNE _0x2D
 ; 0000 00EF                PORTB.0=1;
 	SBI  0x18,0
 ; 0000 00F0         }else{
-	RJMP _0x34
-_0x31:
+	RJMP _0x30
+_0x2D:
 ; 0000 00F1             if(whichSlave-1==1){
 	MOVW R30,R20
 	SBIW R30,1
 	CPI  R30,LOW(0x1)
 	LDI  R26,HIGH(0x1)
 	CPC  R31,R26
-	BRNE _0x35
+	BRNE _0x31
 ; 0000 00F2                 PORTB.1=1;
 	SBI  0x18,1
 ; 0000 00F3             }else{
-	RJMP _0x38
-_0x35:
+	RJMP _0x34
+_0x31:
 ; 0000 00F4                 if(whichSlave-1==2){
 	MOVW R30,R20
 	SBIW R30,1
 	CPI  R30,LOW(0x2)
 	LDI  R26,HIGH(0x2)
 	CPC  R31,R26
-	BRNE _0x39
+	BRNE _0x35
 ; 0000 00F5                    PORTB.2=1;
 	SBI  0x18,2
 ; 0000 00F6                 }
 ; 0000 00F7             }
-_0x39:
-_0x38:
-; 0000 00F8         }
+_0x35:
 _0x34:
+; 0000 00F8         }
+_0x30:
 ; 0000 00F9 
 ; 0000 00FA         if(whichSlave==3){
 	LDI  R30,LOW(3)
 	LDI  R31,HIGH(3)
 	CP   R30,R20
 	CPC  R31,R21
-	BRNE _0x3C
+	BRNE _0x38
 ; 0000 00FB             whichSlave=0;
 	__GETWRN 20,21,0
 ; 0000 00FC         }
 ; 0000 00FD         PORTD.0=1;
-_0x3C:
+_0x38:
 	SBI  0x12,0
 ; 0000 00FE         delay_ms(100);
 	LDI  R26,LOW(100)
@@ -1691,10 +1684,10 @@ _0x3C:
 	CALL _delay_ms
 ; 0000 0101 
 ; 0000 0102       }
-	RJMP _0x21
+	RJMP _0x1D
 ; 0000 0103 }
-_0x41:
-	RJMP _0x41
+_0x3D:
+	RJMP _0x3D
 ; .FEND
 ;
 ;/*

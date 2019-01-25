@@ -41,9 +41,9 @@ unsigned char spi_tranceiver (unsigned char data)
 {
     SPDR = data;                       //Load data into the buffer
     while(!(SPSR & (1<<SPIF) )){
-        PORTD.1=1;
-        delay_ms(300);
-        PORTD.1=0;
+        //PORTD.1=1;
+        //delay_ms(300);
+        //PORTD.1=0;
     }       //Wait until transmission complete
     return(SPDR);                      //Return received data
 }
