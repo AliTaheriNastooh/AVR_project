@@ -33,21 +33,54 @@ int thous=0;
 unsigned char ACKSlave=22;
 unsigned char ACKMaster=44;
 char lcd_show[32];
+int whichSlave=0;
 // Timer1 output compare A interrupt service routine
+void enableSlave(){
+        if(whichSlave==0){
+             PORTB.0=0;
+        }else{
+            if(whichSlave==1){
+             PORTB.1=0;
+            
+            }else{
+                if(whichSlave==2){
+                    PORTB.2=0;          
+                }
+            }
+        
+        }
+}
+void disableSlave(){
+        if(whichSlave==0){
+             PORTB.0=1;
+        }else{
+            if(whichSlave==1){
+             PORTB.1=1;
+            
+            }else{
+                if(whichSlave==2){
+                    PORTB.2=1;          
+                }
+            }
+        
+        }
+}
+
 void send_spi(){
        // lcd_clear();
         //sprintf(lcd_show,"tr=%d ",ACKMaster);
         //lcd_puts(lcd_show);
-        PORTB.3=0;
-        delay_ms(50);
+        enableSlave();
+        delay_ms(200);
         SPDR=ACKMaster;
 }
-
+ int min1=0;
 interrupt [TIM1_COMPA] void timer1_compa_isr(void)
 {
     thous++;
     if(thous==1000){
         thous=0;
+        min1++;
         send_spi();    
     }
 
@@ -70,22 +103,33 @@ data=SPDR;
 //sprintf(lcd_show,"r=%d ",data);
 //lcd_puts(lcd_show);
 if(flag==0){
-    tem=data;
+    tem=data*2;
     if(data!=0){ 
         flag=1;
         //sprintf(lcd_show,"t=%d",x);
         //lcd_puts(lcd_show);
-        speed=calculate_speed(data);
-        PORTB.3=0;
-        delay_ms(200);
+        speed=calculate_speed(tem);
+        //PORTB.3=0;
+        delay_ms(500);
         SPDR=speed;            
         
+    }else{
+        //speed++;
+        disableSlave();
+        whichSlave++;
+        if(whichSlave==3){
+            whichSlave=0;
+        }
     }
 }else{
     flag=0;
     if(data==ACKSlave){
         //speed++;
-        PORTB.3=1;
+        disableSlave();
+        whichSlave++;
+        if(whichSlave==3){
+            whichSlave=0;
+        }
     }
     //sprintf(lcd_show,"rec=%d",data);
     //lcd_puts(lcd_show);
@@ -228,12 +272,17 @@ lcd_init(16);
 
 // Global enable interrupts
 #asm("sei")
- DDRB.3=1;
- PORTB.3=1;
+ DDRB.0=1;
+ PORTB.0=1;
+  DDRB.1=1;
+ PORTB.1=1;
+  DDRB.2=1;
+ PORTB.2=1;
 while (1)
       {                   
          lcd_gotoxy(0,0);
-         sprintf(lcd_show,"temp=%d speed=%d data=%d       ",tem,speed,data);
+         sprintf(lcd_show,"temp=%d spd=%d data=%dsla:%dmin=%d",tem,speed,data,whichSlave,min1);
          lcd_puts(lcd_show);
+		 delay_ms(100);
       }
 }
